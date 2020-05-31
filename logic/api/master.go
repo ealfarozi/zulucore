@@ -207,7 +207,6 @@ func GetAddress(w http.ResponseWriter, r *http.Request) {
 	var allAddr []structs.Address
 
 	db := mysql.InitializeMySQL()
-	params := mux.Vars(r)
 
 	if r.FormValue("all") != "" {
 		prm = r.FormValue("all")
@@ -216,7 +215,6 @@ func GetAddress(w http.ResponseWriter, r *http.Request) {
 		} else {
 			sqlQuery = "select id, province_id, province_name, city_id, city_name, kecamatan_id, kecamatan_name, kelurahan_id, kelurahan_name, zipcode from address_map where kelurahan_name like ?"
 		}
-		log.Println(params)
 	}
 
 	if r.FormValue("province") != "" {
@@ -226,7 +224,6 @@ func GetAddress(w http.ResponseWriter, r *http.Request) {
 		} else {
 			sqlQuery = "select id, name from provinces where name like ?"
 		}
-		log.Println(params)
 	}
 	if r.FormValue("city") != "" {
 		prm = r.FormValue("city")
@@ -235,7 +232,6 @@ func GetAddress(w http.ResponseWriter, r *http.Request) {
 		} else {
 			sqlQuery = "select id, name, province_id from cities where name like ?"
 		}
-		log.Println(params)
 	}
 	if r.FormValue("kecamatan") != "" {
 		prm = r.FormValue("kecamatan")
@@ -244,7 +240,6 @@ func GetAddress(w http.ResponseWriter, r *http.Request) {
 		} else {
 			sqlQuery = "select id, name, city_id from kecamatan where name like ?"
 		}
-		log.Println(params)
 	}
 	if r.FormValue("kelurahan") != "" {
 		prm = r.FormValue("kelurahan")
@@ -253,7 +248,6 @@ func GetAddress(w http.ResponseWriter, r *http.Request) {
 		} else {
 			sqlQuery = "select id, name, kecamatan_id, zipcode from kelurahan where name like ?"
 		}
-		log.Println(params)
 	}
 	var res *sql.Rows
 	var err error
@@ -310,5 +304,28 @@ func GetAddress(w http.ResponseWriter, r *http.Request) {
 
 //GetRoles is func to fulfill the dropbox in FE
 func GetRoles(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
+	var roles []structs.Role
+
+	db := mysql.InitializeMySQL()
+
+	sqlQuery := "select id, name from roles where id != 1"
+
+	res, err := db.Query(sqlQuery)
+	defer mysql.CloseRows(res)
+	if err != nil {
+		common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if res != nil {
+
+		for res.Next() {
+			role := structs.Role{}
+			res.Scan(&role.RoleID, &role.RoleName)
+			roles = append(roles, role)
+		}
+		json.NewEncoder(w).Encode(roles)
+	}
 }

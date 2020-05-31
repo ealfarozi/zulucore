@@ -45,7 +45,7 @@ type Institution struct {
 	BillFullAddress Address `json:"bill_full_address,omitempty"`
 	PICName         string  `json:"pic_name,omitempty" validate:"required"`
 	PICPhone        string  `json:"pic_phone,omitempty" validate:"required"`
-	ExpireAt        string  `json:"expire_at" validate:"required"`
+	ExpireAt        string  `json:"expire_at,omitempty" validate:"required"`
 	Status          int     `json:"status,omitempty"`
 }
 
