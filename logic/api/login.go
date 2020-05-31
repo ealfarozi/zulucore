@@ -15,7 +15,7 @@ import (
 )
 
 //@todo need to put in env
-var expMins time.Duration = 1
+var expMins time.Duration = 60
 var myKey = []byte(mysql.ViperEnvVariable("JWT_KEY"))
 
 //Login and generate the JWT token

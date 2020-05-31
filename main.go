@@ -16,10 +16,13 @@ func main() {
 	r.Handle("/api/v1/tutor/{tutorid}", api.IsAuthorized(api.GetTutor)).Methods("GET")
 	r.Handle("/api/v1/institution", api.IsAuthorized(api.GetInstitution)).Methods("GET")
 	r.Handle("/api/v1/institutions", api.IsAuthorized(api.GetInstitutions)).Methods("GET")
+	r.Handle("/api/v1/institutions", api.IsAuthorized(api.CreateInstitutions)).Methods("POST")
 	r.Handle("/api/v1/references", api.IsAuthorized(api.GetReferences)).Methods("GET")
+	r.Handle("/api/v1/address", api.IsAuthorized(api.GetAddress)).Methods("GET")
 	r.Handle("/api/v1/userLogin", api.IsAuthorized(api.CreateUserLogin)).Methods("POST")
 	r.HandleFunc("/api/v1/login", api.Login).Methods("POST")
 
 	//3 - Run the server
+	//log.Fatal(http.ListenAndServe(":8000", r))
 	log.Fatal(http.ListenAndServe(":80", r))
 }

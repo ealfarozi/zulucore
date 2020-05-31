@@ -1,8 +1,6 @@
 package structs
 
-import (
-	"time"
-)
+import "time"
 
 //User for UserLogin
 type User struct {
@@ -36,32 +34,31 @@ type UserData struct {
 
 //Institution is the struct to get institutions
 type Institution struct {
-	ID              int64     `json:"id,omitempty"`
-	Code            string    `json:"code" validate:"required"`
-	Name            string    `json:"name" validate:"required"`
-	Street          string    `json:"street_address,omitempty" validate:"required"`
-	FullAddress     []Address `json:"full_address,omitempty"`
-	BillStreet      string    `json:"bill_address,omitempty" validate:"required"`
-	BillFullAddress []Address `json:"bill_full_address,omitempty"`
-	PICName         string    `json:"pic_name,omitempty" validate:"required"`
-	PICPhone        string    `json:"pic_phone,omitempty" validate:"required"`
-	ExpireAt        string    `json:"expire_at" validate:"required"`
-	Status          int       `json:"status"`
+	ID              int64   `json:"id,omitempty"`
+	Code            string  `json:"code" validate:"required"`
+	Name            string  `json:"name" validate:"required"`
+	Street          string  `json:"street_address,omitempty" validate:"required"`
+	MapID           int     `json:"address_map_id,omitempty" validate:"required"`
+	FullAddress     Address `json:"full_address,omitempty"`
+	BillStreet      string  `json:"bill_address,omitempty" validate:"required"`
+	BillMapID       int     `json:"bill_address_map_id,omitempty" validate:"required"`
+	BillFullAddress Address `json:"bill_full_address,omitempty"`
+	PICName         string  `json:"pic_name,omitempty" validate:"required"`
+	PICPhone        string  `json:"pic_phone,omitempty" validate:"required"`
+	ExpireAt        string  `json:"expire_at" validate:"required"`
+	Status          int     `json:"status,omitempty"`
 }
-
-//pic_name, pic_phone, expired_at, status
 
 //Address is the struct to get Map address
 type Address struct {
-	ID            int    `json:"id"`
-	ProvinceID    int    `json:"province_id"`
+	ID            int    `json:"id,omitempty"`
+	ProvinceID    int    `json:"province_id,omitempty"`
 	ProvinceName  string `json:"province_name,omitempty"`
-	CityID        int    `json:"city_id"`
+	CityID        int    `json:"city_id,omitempty"`
 	CityName      string `json:"city_name,omitempty"`
-	KecamatanID   int    `json:"kecamatan_id"`
+	KecamatanID   int    `json:"kecamatan_id,omitempty"`
 	KecamatanName string `json:"kecamatan_name,omitempty"`
-	KelurahanID   int    `json:"kelurahan_id"`
+	KelurahanID   int    `json:"kelurahan_id,omitempty"`
 	KelurahanName string `json:"kelurahan_name,omitempty"`
-	ZipCodeID     int    `json:"zipcode_id"`
 	ZipCode       string `json:"zipcode,omitempty"`
 }
