@@ -15,6 +15,7 @@ func main() {
 	r.Handle("/api/v1/tutors", api.IsAuthorized(api.CreateTutors)).Methods("POST")
 	r.Handle("/api/v1/tutors", api.IsAuthorized(api.GetTutors)).Methods("GET")
 	r.Handle("/api/v1/tutor", api.IsAuthorized(api.GetTutor)).Methods("GET")
+	r.Handle("/api/v1/tutordetails", api.IsAuthorized(api.GetTutorDetails)).Methods("GET")
 	r.Handle("/api/v1/institution", api.IsAuthorized(api.GetInstitution)).Methods("GET")
 	r.Handle("/api/v1/institutions", api.IsAuthorized(api.GetInstitutions)).Methods("GET")
 	r.Handle("/api/v1/institutions", api.IsAuthorized(api.CreateInstitutions)).Methods("POST")

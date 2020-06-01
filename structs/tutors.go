@@ -2,11 +2,16 @@ package structs
 
 //Tutor struct
 type Tutor struct {
-	ID          int32              `json:"id,omitempty"`
-	NomorInduk  string             `json:"nomor_induk" validate:"required"`
-	Name        string             `json:"name" validate:"required"`
-	TutorTypeID int                `json:"type" validate:"required"`
-	UserID      int32              `json:"user_id" validate:"required"`
+	ID          int32  `json:"id,omitempty"`
+	NomorInduk  string `json:"nomor_induk" validate:"required"`
+	Name        string `json:"name" validate:"required"`
+	TutorTypeID int    `json:"type" validate:"required"`
+	UserID      int32  `json:"user_id" validate:"required"`
+	//select usr.username, ttr.nomor_induk, ttr.name, ur.institution_id
+	//from users usr inner join tutors ttr on usr.id = ttr.user_id
+	//inner join user_roles ur on ur.user_id = ttr.user_id
+	//input by system, please check above query if there's a mismatch input. because, the institution ids are sit in the user_roles table
+	InsID       int32              `json:"institution_id,omitempty" validate:"required"`
 	Status      int32              `json:"status"`
 	Details     *TutorDetails      `json:"details,omitempty"`
 	Education   []TutorEducation   `json:"education,omitempty"`
@@ -29,13 +34,13 @@ type TutorDetails struct {
 	Dob            string  `json:"dob" validate:"required"`
 	Phone          string  `json:"phone" validate:"required,min=8,max=20,startswith=08"`
 	Email          string  `json:"email"  validate:"required,email"`
+	InsSource      string  `json:"institution_name,omitempty"`
+	JoinDate       string  `json:"join_date,omitempty"`
+	TutorID        int64   `json:"tutor_id,omitempty" validate:"required"`
+	UserID         int32   `json:"user_id,omitempty" validate:"required"`
 	StreetAddress  string  `json:"street_address,omitempty"`
 	AddressID      int     `json:"address_map_id,omitempty"`
 	AddressDetail  Address `json:"address_detail,omitempty"`
-	InsSource      string  `json:"institution_name,omitempty"`
-	JoinDate       string  `json:"join_date,omitempty"`
-	TutorID        int32   `json:"tutor_id" validate:"required"`
-	UserID         int32   `json:"user_id" validate:"required"`
 }
 
 //TutorEducation is the struct to get the education details of a tutor
@@ -44,33 +49,33 @@ type TutorEducation struct {
 	UnivDegreeID int    `json:"univ_degree_id" validate:"required"`
 	UnivName     string `json:"univ_name" validate:"required"`
 	Years        int    `json:"years" validate:"required"`
-	TutorID      int32  `json:"tutor_id" validate:"required"`
+	TutorID      int64  `json:"tutor_id" validate:"required"`
 }
 
 //TutorCertificate is the struct to get the certificate details of a tutor
 type TutorCertificate struct {
 	ID       int    `json:"id,omitempty"`
-	CertName int    `json:"cert_name" validate:"required"`
+	CertName string `json:"cert_name" validate:"required"`
 	CertDate string `json:"cert_date" validate:"required"`
-	TutorID  int32  `json:"tutor_id" validate:"required"`
+	TutorID  int64  `json:"tutor_id" validate:"required"`
 }
 
 //TutorExperience is the struct to get the experience details of a tutor
 type TutorExperience struct {
 	ID          int    `json:"id,omitempty"`
-	ExpName     int    `json:"exp_name" validate:"required"`
+	ExpName     string `json:"exp_name" validate:"required"`
 	Description string `json:"description" validate:"required"`
 	Years       int    `json:"years" validate:"required"`
-	TutorID     int32  `json:"tutor_id" validate:"required"`
+	TutorID     int64  `json:"tutor_id" validate:"required"`
 }
 
 //TutorResearch is the struct to get the research list of a tutor
 type TutorResearch struct {
 	ID          int    `json:"id,omitempty"`
-	ResName     int    `json:"research_name" validate:"required"`
+	ResName     string `json:"research_name" validate:"required"`
 	Description string `json:"description" validate:"required"`
 	Years       int    `json:"years" validate:"required"`
-	TutorID     int32  `json:"tutor_id" validate:"required"`
+	TutorID     int64  `json:"tutor_id" validate:"required"`
 }
 
 //TutorJournal is the struct to get the journal list of a tutor
@@ -79,5 +84,5 @@ type TutorJournal struct {
 	JourName    string `json:"journal_name" validate:"required"`
 	PublishAt   string `json:"publish_at" validate:"required"`
 	PublishDate string `json:"publish_date" validate:"required"`
-	TutorID     int32  `json:"tutor_id" validate:"required"`
+	TutorID     int64  `json:"tutor_id" validate:"required"`
 }

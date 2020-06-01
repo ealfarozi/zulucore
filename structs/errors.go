@@ -22,4 +22,5 @@ var (
 	RowsAffErr    = "error while getting rows affected"
 	LastIDErr     = "error whilte getting last inserted id"
 	Validate      = "error when validating the data"
+	NomorInd      = "nomor induk is exist for that institutions"
 )

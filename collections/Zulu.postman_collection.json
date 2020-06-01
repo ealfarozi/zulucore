@@ -79,7 +79,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/api/v1/tutors",
+							"raw": "{{url}}/api/v1/tutors?institution_id=3",
 							"host": [
 								"{{url}}"
 							],
@@ -87,6 +87,12 @@
 								"api",
 								"v1",
 								"tutors"
+							],
+							"query": [
+								{
+									"key": "institution_id",
+									"value": "3"
+								}
 							]
 						}
 					},
@@ -116,15 +122,148 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/api/v1/tutor/2312332",
+							"raw": "{{url}}/api/v1/tutor?institution_id=1&nomor_induk=A123",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"tutor",
-								"2312332"
+								"tutor"
+							],
+							"query": [
+								{
+									"key": "institution_id",
+									"value": "1"
+								},
+								{
+									"key": "nomor_induk",
+									"value": "A123"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tutor with like Name",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/tutor?institution_id=3&name=lan",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tutor"
+							],
+							"query": [
+								{
+									"key": "institution_id",
+									"value": "3"
+								},
+								{
+									"key": "name",
+									"value": "lan"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Tutor Complete",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n   {\n      \"nomor_induk\":\"A12345678\",\n      \"name\":\"Andi\",\n      \"type\":1,\n      \"user_id\":3,\n      \"institution_id\":1,\n      \"details\":{\n         \"degree_front\":\"Prof\",\n         \"degree_back\":\"S.Kom\",\n         \"ktp\":\"1283818203891028312\",\n         \"sim\":\"1283182312312\",\n         \"npwp\":\"128379182731\",\n         \"gender_id\":2,\n         \"pob_id\":1000,\n         \"dob\":\"1990-05-05\",\n         \"phone\":\"081234567895\",\n         \"email\":\"asdasd@asd.com\",\n         \"street_address\":\"Jalan Raya ajah\",\n         \"address_map_id\":7880,\n         \"institution_name\":\"Universitas Bukan Sembarangan\",\n         \"join_date\":\"2000-01-01\"\n      },\n      \"education\":[\n         {\n            \"univ_degree_id\":20,\n            \"univ_name\":\"Universitas Terbuka Buat Prof\",\n            \"years\":2010\n         }\n      ],\n      \"certificate\":[\n         {\n            \"cert_name\":\"Sertifikat A\",\n            \"cert_date\":\"2018-01-01\"\n         },\n         {\n            \"cert_name\":\"Sertifikat B\",\n            \"cert_date\":\"2016-01-01\"\n         },\n         {\n            \"cert_name\":\"Sertifikat C\",\n            \"cert_date\":\"2016-01-01\"\n         }\n      ],\n      \"experience\":[\n         {\n            \"exp_name\":\"PT ABC - Asst.\",\n            \"description\":\"lorem ipsum dolor\",\n            \"years\":2007\n         },\n         {\n            \"exp_name\":\"PT DSA - Mgr\",\n            \"description\":\"lorem ipsum dolor\",\n            \"years\":2009\n         }\n      ],\n      \"journal\":[\n         {\n            \"journal_name\":\"Journal AAA\",\n            \"publish_at\":\"lorem ipsum dolor\",\n            \"publish_date\":\"2019-09-09\"\n         },\n         {\n            \"journal_name\":\"Journal BBB\",\n            \"publish_at\":\"lorem ipsum dolor sit\",\n            \"publish_date\":\"2020-09-09\"\n         },\n         {\n            \"journal_name\":\"Journal CCC\",\n            \"publish_at\":\"lorem ipsum dolor sit amet\",\n            \"publish_date\":\"2020-09-09\"\n         }\n      ],\n      \"research\":[\n         {\n            \"research_name\":\"Penelitian di AAAA\",\n            \"description\":\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do\",\n            \"years\":2020\n         },\n         {\n            \"research_name\":\"Penelitian di BBBB\",\n            \"description\":\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore\",\n            \"years\":2018\n         }\n      ]\n   },\n   {\n      \"nomor_induk\":\"B12345678\",\n      \"name\":\"Adi\",\n      \"type\":2,\n      \"user_id\":4,\n      \"institution_id\":3,\n      \"status\":2,\n      \"details\":{\n         \"degree_front\":\"Dr.\",\n         \"degree_back\":\"S.T.\",\n         \"ktp\":\"1283818203891028311\",\n         \"sim\":\"1283182312311\",\n         \"npwp\":\"128379182732\",\n         \"gender_id\":1,\n         \"pob_id\":52,\n         \"dob\":\"1990-05-05\",\n         \"phone\":\"081234567896\",\n         \"email\":\"asdasd@asd.com\",\n         \"street_address\":\"Jalan Raya ajah\",\n         \"address_map_id\":7879,\n         \"institution_name\":\"Universitas Bukan Sembarangan\",\n         \"join_date\":\"2005-01-01\"\n      }\n   },\n   {\n      \"nomor_induk\":\"C12345678\",\n      \"name\":\"Ihsan\",\n      \"type\":1,\n      \"user_id\":3,\n      \"institution_id\":3,\n      \"status\":3,\n      \"journal\":[\n         {\n            \"journal_name\":\"Journal AAA-1\",\n            \"publish_at\":\"lorem ipsum dolor\",\n            \"publish_date\":\"2019-10-09\"\n         },\n         {\n            \"journal_name\":\"Journal BBB-1\",\n            \"publish_at\":\"lorem ipsum dolor sit\",\n            \"publish_date\":\"2020-10-09\"\n         },\n         {\n            \"journal_name\":\"Journal CCC-1\",\n            \"publish_at\":\"lorem ipsum dolor sit amet\",\n            \"publish_date\":\"2020-10-09\"\n         }\n      ]\n   },\n   {\n      \"nomor_induk\":\"D12345678\",\n      \"name\":\"Ahlan\",\n      \"type\":1,\n      \"user_id\":3,\n      \"institution_id\":3,\n      \"status\":3,\n      \"research\":[\n         {\n            \"research_name\":\"Penelitian di CCCC\",\n            \"description\":\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do\",\n            \"years\":2017\n         },\n         {\n            \"research_name\":\"Penelitian di DDDD\",\n            \"description\":\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore\",\n            \"years\":2018\n         }\n      ]\n   },\n   {\n      \"nomor_induk\":\"E12345678\",\n      \"name\":\"Ahlan\",\n      \"type\":1,\n      \"user_id\":3,\n      \"institution_id\":3,\n      \"status\":3,\n      \"experience\":[\n         {\n            \"exp_name\":\"PT CDE - Asst\",\n            \"description\":\"lorem ipsum dolor\",\n            \"years\":2006\n         },\n         {\n            \"exp_name\":\"PT EFG - Mgr\",\n            \"description\":\"lorem ipsum dolor\",\n            \"years\":2008\n         }\n      ]\n   },\n   {\n      \"nomor_induk\":\"F12345678\",\n      \"name\":\"Ahlan\",\n      \"type\":1,\n      \"user_id\":3,\n      \"institution_id\":3,\n      \"status\":3,\n      \"certificate\":[\n         {\n            \"cert_name\":\"Sertifikat ABC\",\n            \"cert_date\":\"2017-12-01\"\n         },\n         {\n            \"cert_name\":\"Sertifikat BCD\",\n            \"cert_date\":\"2018-05-01\"\n         }\n      ]\n   },\n   {\n      \"nomor_induk\":\"G12345678\",\n      \"name\":\"Ahlan\",\n      \"type\":1,\n      \"user_id\":1,\n      \"institution_id\":1,\n      \"status\":3,\n      \"education\":[\n         {\n            \"univ_degree_id\":18,\n            \"univ_name\":\"Universitas Terbuka Lorem\",\n            \"years\":2006\n         },\n         {\n            \"univ_degree_id\":19,\n            \"univ_name\":\"Universitas Terbuka Ipsum\",\n            \"years\":2011\n         }\n      ]\n   }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/tutors",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tutors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tutor Details with Tutor ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/tutordetails?tutor_id=83",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tutordetails"
+							],
+							"query": [
+								{
+									"key": "tutor_id",
+									"value": "83"
+								}
 							]
 						}
 					},
