@@ -22,3 +22,14 @@ PS:
 
 ## cara pull
 cara pull cukup mudah, hanya `git pull`
+
+## how to start
+- `go mod init` --> init go mod file
+- `go mod tidy` --> downloading all of the dependencies
+- create your own `.env` file (set your JWT_KEY and DB_URL)
+- DB_URL format `user:pwd@(url:port)/dbname`, example: `root:password@(localhost:3306)/zulu`
+- remove go.mod and go.sum files
+- `go run main.go`
+- because, he make file is not ready yet, please make sure you're doing below installation:
+- `go get -u github.com/gorilla/mux`
+- `go get -u gopkg.in/go-playground/validator.v9`
