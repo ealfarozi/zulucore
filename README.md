@@ -30,6 +30,6 @@ cara pull cukup mudah, hanya `git pull`
 - DB_URL format `user:pwd@(url:port)/dbname`, example: `root:password@(localhost:3306)/zulu`
 - remove go.mod and go.sum files
 - `go run main.go` after this command runs, go will downloading all of the packages
-- because, he make file is not ready yet, please make sure you're doing below installation:
+- because, the makefile is not ready yet, please make sure you're doing below installation:
 - `go get -u github.com/gorilla/mux`
 - `go get -u gopkg.in/go-playground/validator.v9`
