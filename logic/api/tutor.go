@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -194,14 +195,14 @@ func GetTutor(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//UpdateTutorEducations is the func to create/update the education in tutor entity. please note that status = 0 (soft delete)
+//UpdateEducations is the func to create/update the education in tutor entity. please note that status = 0 (soft delete)
 func UpdateEducations(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var edus []structs.TutorEducation
 	var errstr structs.ErrorMessage
 	var queryStr string
-	var refId int
+	var refID int
 
 	_ = json.NewDecoder(r.Body).Decode(&edus)
 
@@ -229,14 +230,14 @@ func UpdateEducations(w http.ResponseWriter, r *http.Request) {
 
 		if edus[j].ID != 0 {
 			queryStr = updateEdu
-			refId = edus[j].ID
+			refID = edus[j].ID
 		} else {
 			queryStr = insertEdu
-			refId = edus[j].TutorID
+			refID = edus[j].TutorID
 			edus[j].Status = 1
 		}
 
-		_, err2 := tx.Exec(queryStr, &edus[j].UnivDegreeID, &edus[j].UnivName, &edus[j].Years, &edus[j].Status, &refId)
+		_, err2 := tx.Exec(queryStr, &edus[j].UnivDegreeID, &edus[j].UnivName, &edus[j].Years, &edus[j].Status, &refID)
 		if err2 != nil {
 			tx.Rollback()
 			common.JSONError(w, structs.QueryErr, err2.Error(), http.StatusInternalServerError)
@@ -251,14 +252,14 @@ func UpdateEducations(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(errstr)
 }
 
-//UpdateTutorCertificates is the func to create/update the certificates in tutor entity. please note that status = 0 (soft delete)
+//UpdateCertificates is the func to create/update the certificates in tutor entity. please note that status = 0 (soft delete)
 func UpdateCertificates(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var certs []structs.TutorCertificate
 	var errstr structs.ErrorMessage
 	var queryStr string
-	var refId int
+	var refID int
 
 	_ = json.NewDecoder(r.Body).Decode(&certs)
 
@@ -286,14 +287,14 @@ func UpdateCertificates(w http.ResponseWriter, r *http.Request) {
 
 		if certs[j].ID != 0 {
 			queryStr = updateCert
-			refId = certs[j].ID
+			refID = certs[j].ID
 		} else {
 			queryStr = insertCert
-			refId = certs[j].TutorID
+			refID = certs[j].TutorID
 			certs[j].Status = 1
 		}
 
-		_, err2 := tx.Exec(queryStr, &certs[j].CertName, &certs[j].CertDate, &certs[j].Status, &refId)
+		_, err2 := tx.Exec(queryStr, &certs[j].CertName, &certs[j].CertDate, &certs[j].Status, &refID)
 		if err2 != nil {
 			tx.Rollback()
 			common.JSONError(w, structs.QueryErr, err2.Error(), http.StatusInternalServerError)
@@ -308,14 +309,14 @@ func UpdateCertificates(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(errstr)
 }
 
-//UpdateTutorExperiences is the func to create/update the experiences in tutor entity. please note that status = 0 (soft delete)
+//UpdateExperiences is the func to create/update the experiences in tutor entity. please note that status = 0 (soft delete)
 func UpdateExperiences(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var exps []structs.TutorExperience
 	var errstr structs.ErrorMessage
 	var queryStr string
-	var refId int
+	var refID int
 
 	_ = json.NewDecoder(r.Body).Decode(&exps)
 
@@ -343,14 +344,14 @@ func UpdateExperiences(w http.ResponseWriter, r *http.Request) {
 
 		if exps[j].ID != 0 {
 			queryStr = updateExp
-			refId = exps[j].ID
+			refID = exps[j].ID
 		} else {
 			queryStr = insertExp
-			refId = exps[j].TutorID
+			refID = exps[j].TutorID
 			exps[j].Status = 1
 		}
 
-		_, err2 := tx.Exec(queryStr, &exps[j].ExpName, &exps[j].Description, &exps[j].Years, &exps[j].Status, &refId)
+		_, err2 := tx.Exec(queryStr, &exps[j].ExpName, &exps[j].Description, &exps[j].Years, &exps[j].Status, &refID)
 		if err2 != nil {
 			tx.Rollback()
 			common.JSONError(w, structs.QueryErr, err2.Error(), http.StatusInternalServerError)
@@ -365,14 +366,14 @@ func UpdateExperiences(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(errstr)
 }
 
-//UpdateTutorJournals is the func to create/update the journal in tutor entity. please note that status = 0 (soft delete)
+//UpdateJournals is the func to create/update the journal in tutor entity. please note that status = 0 (soft delete)
 func UpdateJournals(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var jours []structs.TutorJournal
 	var errstr structs.ErrorMessage
 	var queryStr string
-	var refId int
+	var refID int
 
 	_ = json.NewDecoder(r.Body).Decode(&jours)
 
@@ -400,14 +401,14 @@ func UpdateJournals(w http.ResponseWriter, r *http.Request) {
 
 		if jours[j].ID != 0 {
 			queryStr = updateJour
-			refId = jours[j].ID
+			refID = jours[j].ID
 		} else {
 			queryStr = insertJour
-			refId = jours[j].TutorID
+			refID = jours[j].TutorID
 			jours[j].Status = 1
 		}
 
-		_, err2 := tx.Exec(queryStr, &jours[j].JourName, &jours[j].PublishAt, &jours[j].PublishDate, &jours[j].Status, &refId)
+		_, err2 := tx.Exec(queryStr, &jours[j].JourName, &jours[j].PublishAt, &jours[j].PublishDate, &jours[j].Status, &refID)
 		if err2 != nil {
 			tx.Rollback()
 			common.JSONError(w, structs.QueryErr, err2.Error(), http.StatusInternalServerError)
@@ -422,14 +423,14 @@ func UpdateJournals(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(errstr)
 }
 
-//UpdateTutorResearches is the func to create/update the journal in tutor entity. please note that status = 0 (soft delete)
+//UpdateResearches is the func to create/update the journal in tutor entity. please note that status = 0 (soft delete)
 func UpdateResearches(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var rschs []structs.TutorResearch
 	var errstr structs.ErrorMessage
 	var queryStr string
-	var refId int
+	var refID int
 
 	_ = json.NewDecoder(r.Body).Decode(&rschs)
 
@@ -457,14 +458,14 @@ func UpdateResearches(w http.ResponseWriter, r *http.Request) {
 
 		if rschs[j].ID != 0 {
 			queryStr = updateRsch
-			refId = rschs[j].ID
+			refID = rschs[j].ID
 		} else {
 			queryStr = insertRsch
-			refId = rschs[j].TutorID
+			refID = rschs[j].TutorID
 			rschs[j].Status = 1
 		}
 
-		_, err2 := tx.Exec(queryStr, &rschs[j].ResName, &rschs[j].Description, &rschs[j].Years, &rschs[j].Status, &refId)
+		_, err2 := tx.Exec(queryStr, &rschs[j].ResName, &rschs[j].Description, &rschs[j].Years, &rschs[j].Status, &refID)
 		if err2 != nil {
 			tx.Rollback()
 			common.JSONError(w, structs.QueryErr, err2.Error(), http.StatusInternalServerError)
@@ -479,68 +480,103 @@ func UpdateResearches(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(errstr)
 }
 
-//UpdateDetail is the func to create/update the journal in tutor entity. please note that status = 0 (soft delete)
+//UpdateDetail is the func to create/update the tutor detail (ONLY) on Frontend side for tutor entity. the update will includes nomor_induk and tutor_name as well
+//please note that status = 0 (soft delete). In order to create a new tutor please refer to CreateTutors func
+//email field should be coming from Login func
 func UpdateDetail(w http.ResponseWriter, r *http.Request) {
-	/*
-		w.Header().Set("Content-Type", "application/json")
 
-		var det []structs.TutorDetails
-		var errstr structs.ErrorMessage
-		var queryStr string
-		var refId int
+	w.Header().Set("Content-Type", "application/json")
 
-		_ = json.NewDecoder(r.Body).Decode(&det)
+	var tutors []structs.Tutor
+	var errstr structs.ErrorMessage
 
-		db := mysql.InitializeMySQL()
-		tx, err := db.Begin()
+	_ = json.NewDecoder(r.Body).Decode(&tutors)
 
+	db := mysql.InitializeMySQL()
+	tx, err := db.Begin()
+
+	if err != nil {
+		tx.Rollback()
+		common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//updating email will update the username in users table
+	insertDet := "insert into tutor_details (education_degree_front, education_degree_back, ktp, sim, npwp, gender_id, pob_id, dob, phone, email, street_address, address_id, institution_source_name, join_date, tutor_id, user_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	updateDet := "update tutor_details set education_degree_front = ?, education_degree_back = ?, ktp = ?, sim = ?, npwp = ?, gender_id = ?, pob_id = ?, dob = ?, phone = ?, email = ?, street_address = ?, address_id = ?, institution_source_name = ?, join_date = ?, updated_at = now(), updated_by = 'API' where id = ?"
+	updateTut := "update tutors set nomor_induk = ?, name = ?, tutor_type_id = ?, status = ? where id = ?"
+	updateUsr := "update users set username = ? where id = ?"
+
+	j := 0
+	for range tutors {
+		v := validator.New()
+		err = v.Struct(tutors[j])
 		if err != nil {
 			tx.Rollback()
-			common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
+			common.JSONError(w, structs.Validate, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		//updating email will update the username
-		insertDet := "insert into tutor_details (education_degree_front, education_degree_back, ktp, sim, npwp, gender_id, pob_id, dob, phone, email, street_address, address_id, institution_source_name, join_date, tutor_id, user_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-		updateDet := "update tutor_details set education_degree_front = ?, education_degree_back = ?, ktp = ?, sim = ?, npwp = ?, gender_id = ?, pob_id = ?, dob = ?, phone = ?, email = ?, street_address = ?, address_id, institution_source_name, join_date, tutor_id, user_id, updated_at = now(), updated_by = 'API' where id = ?"
-		updateUsr := "update users set username = ? where id = ?"
+		checkNmrInduk := common.CheckNomorInduk(tutors[j].InsID, tutors[j].NomorInduk, tutors[j].ID)
 
-		j := 0
-		for range rschs {
-			v := validator.New()
-			err = v.Struct(rschs[j])
-			if err != nil {
-				tx.Rollback()
-				common.JSONError(w, structs.Validate, err.Error(), http.StatusInternalServerError)
-				return
-			}
-
-			if rschs[j].ID != 0 {
-				queryStr = updateRsch
-				refId = rschs[j].ID
-			} else {
-				queryStr = insertRsch
-				refId = rschs[j].TutorID
-				rschs[j].Status = 1
-			}
-
-			_, err2 := tx.Exec(queryStr, &rschs[j].ResName, &rschs[j].Description, &rschs[j].Years, &rschs[j].Status, &refId)
-			if err2 != nil {
-				tx.Rollback()
-				common.JSONError(w, structs.QueryErr, err2.Error(), http.StatusInternalServerError)
-				return
-			}
-			j++
+		if checkNmrInduk != 0 {
+			tx.Rollback()
+			common.JSONError(w, structs.NomorInd, "", http.StatusInternalServerError)
+			return
 		}
 
-		errstr.Message = structs.Success
-		errstr.Code = http.StatusOK
-		tx.Commit()
-		json.NewEncoder(w).Encode(errstr)
-	*/
+		checkEmail := common.CheckEmail(tutors[j].Details.Email, tutors[j].UserID)
+
+		if checkEmail != 0 {
+			tx.Rollback()
+			common.JSONError(w, structs.Email, "", http.StatusInternalServerError)
+			return
+		}
+
+		if tutors[j].ID != 0 {
+			//update
+			_, err := tx.Exec(updateDet, &tutors[j].Details.EducationFront, &tutors[j].Details.EducationBack, &tutors[j].Details.Ktp, &tutors[j].Details.Sim, &tutors[j].Details.Npwp, &tutors[j].Details.GenderID, &tutors[j].Details.PobID, &tutors[j].Details.Dob, &tutors[j].Details.Phone, &tutors[j].Details.Email, &tutors[j].Details.StreetAddress, &tutors[j].Details.AddressID, &tutors[j].Details.InsSource, &tutors[j].Details.JoinDate, &tutors[j].Details.ID)
+			if err != nil {
+				tx.Rollback()
+				common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			_, err2 := tx.Exec(updateTut, &tutors[j].NomorInduk, &tutors[j].Name, &tutors[j].TutorTypeID, &tutors[j].Status, &tutors[j].ID)
+			if err2 != nil {
+				tx.Rollback()
+				common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			_, err3 := tx.Exec(updateUsr, &tutors[j].Details.Email, &tutors[j].UserID)
+			if err3 != nil {
+				tx.Rollback()
+				common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+		} else {
+			//insert
+			_, err := tx.Exec(insertDet, &tutors[j].Details.EducationFront, &tutors[j].Details.EducationBack, &tutors[j].Details.Ktp, &tutors[j].Details.Sim, &tutors[j].Details.Npwp, &tutors[j].Details.GenderID, &tutors[j].Details.PobID, &tutors[j].Details.Dob, &tutors[j].Details.Phone, &tutors[j].Details.Email, &tutors[j].Details.StreetAddress, &tutors[j].Details.AddressID, &tutors[j].Details.InsSource, &tutors[j].Details.JoinDate, &tutors[j].ID, &tutors[j].UserID)
+			if err != nil {
+				tx.Rollback()
+				common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+		j++
+	}
+
+	errstr.Message = structs.Success
+	errstr.Code = http.StatusOK
+	tx.Commit()
+	json.NewEncoder(w).Encode(errstr)
+
 }
 
-//CreateTutors is func that will insert multiple tutors at once (complete)
+//CreateTutors is the func that will insert multiple tutors at once (complete).
+//please note that the email in request parameter is the username coming from Login func
 func CreateTutors(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -561,18 +597,11 @@ func CreateTutors(w http.ResponseWriter, r *http.Request) {
 
 	j := 0
 	for range tutors {
-		sqlQueryCheck := "SELECT count(1) FROM tutors ttr inner join (select user_id from user_roles where institution_id = ?) ur on ttr.user_id = ur.user_id where ttr.nomor_induk = ?"
-		check := 0
-		err := db.QueryRow(sqlQueryCheck, &tutors[j].InsID, &tutors[j].NomorInduk).Scan(&check)
-
-		if err != nil {
-			tx.Rollback()
-			common.JSONError(w, structs.ErrNotFound, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		check := common.CheckNomorInduk(tutors[j].InsID, tutors[j].NomorInduk, 0)
 
 		if check != 0 {
 			tx.Rollback()
+			fmt.Printf(tutors[j].NomorInduk)
 			common.JSONError(w, structs.NomorInd, "", http.StatusInternalServerError)
 			return
 		}
@@ -717,7 +746,7 @@ func CreateTutors(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//UpdateTutors (multiple)
+//UpdateTutor (multiple)
 func UpdateTutor(w http.ResponseWriter, r *http.Request) {
 
 }

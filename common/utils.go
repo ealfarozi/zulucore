@@ -37,3 +37,37 @@ func GetAddressOnly(addID int) structs.Address {
 	}
 	return addr
 }
+
+//CheckNomorInduk is the func to check registered/updated nomor induk
+func CheckNomorInduk(insID int, nmrInduk string, tutorID int) int {
+	db := mysql.InitializeMySQL()
+	sqlQueryCheck := "SELECT count(1) FROM tutors ttr inner join (select user_id from user_roles where institution_id = ?) ur on ttr.user_id = ur.user_id where ttr.nomor_induk = ? "
+	check := 0
+	if tutorID != 0 {
+		sqlQueryCheck += "and ttr.id != ?"
+		err := db.QueryRow(sqlQueryCheck, &insID, &nmrInduk, &tutorID).Scan(&check)
+		if err != nil {
+			check = 99
+		}
+	} else {
+		err := db.QueryRow(sqlQueryCheck, &insID, &nmrInduk).Scan(&check)
+		if err != nil {
+			check = 99
+		}
+	}
+
+	return check
+}
+
+//CheckEmail is the func to check registered/updated email
+func CheckEmail(email string, usrID int) int {
+	db := mysql.InitializeMySQL()
+	sqlQueryCheck := "select count(1) from users where username = ? and id != ?"
+	check := 0
+	err := db.QueryRow(sqlQueryCheck, &email, &usrID).Scan(&check)
+
+	if err != nil {
+		check = 99
+	}
+	return check
+}
