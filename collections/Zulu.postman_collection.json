@@ -56,7 +56,7 @@
 			"name": "Tutor",
 			"item": [
 				{
-					"name": "Get Tutors",
+					"name": "Get Tutor List",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -221,6 +221,181 @@
 								"api",
 								"v1",
 								"tutors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update/Create Educations",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n        \"univ_degree_id\": 16,\n        \"univ_name\": \"Universitas Terbuka\",\n        \"years\": 2012,\n        \"tutor_id\": 89\n    },\n    {\n        \"univ_degree_id\": 17,\n        \"univ_name\": \"Institut Terbuka Bandung\",\n        \"years\": 2014,\n        \"tutor_id\": 89\n    },\n    {\n        \"ID\": 25,\n        \"univ_degree_id\": 20,\n        \"univ_name\": \"Universitas Pancasila Bangsa Lagi\",\n        \"years\": 2013,\n        \"tutor_id\": 89,\n        \"status\": 0\n    }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/tutor/educations",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tutor",
+								"educations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update/Create Certificates",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n   {\n      \"id\":7,\n      \"cert_name\":\"Sertifikat AA\",\n      \"cert_date\":\"2011-01-01\",\n      \"tutor_id\":83,\n      \"status\":1\n   },\n   {\n      \"id\":8,\n      \"cert_name\":\"Sertifikat BB\",\n      \"cert_date\":\"2012-01-01\",\n      \"tutor_id\":83,\n      \"status\":1\n   },\n   {\n      \"id\":9,\n      \"cert_name\":\"Sertifikat CC\",\n      \"cert_date\":\"2013-01-01\",\n      \"tutor_id\":83,\n      \"status\":0\n   },\n   {\n      \"cert_name\":\"Sertifikat H\",\n      \"cert_date\":\"2014-01-01\",\n      \"tutor_id\":83\n   },\n   {\n      \"cert_name\":\"Sertifikat I\",\n      \"cert_date\":\"2015-01-01\",\n      \"tutor_id\":83\n   }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/tutor/certificates",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tutor",
+								"certificates"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update/Create Experiences",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n        {\n            \"id\": 17,\n            \"exp_name\": \"PT AAA - Asst.\",\n            \"description\": \"lorem ipsum dolor\",\n            \"years\": 2007,\n            \"tutor_id\":70,\n            \"status\":0\n        },\n        {\n            \"id\": 18,\n            \"exp_name\": \"PT BBB - Mgr\",\n            \"description\": \"lorem ipsum dolor\",\n            \"years\": 2009,\n            \"tutor_id\":70,\n            \"status\":0\n        },\n        {\n            \"exp_name\": \"PT DDD - Mgr\",\n            \"description\": \"lorem ipsum dolor\",\n            \"years\": 2009,\n            \"tutor_id\":70\n        }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/tutor/experiences",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tutor",
+								"experiences"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update/Create Journals",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n        \"id\": 43,\n        \"journal_name\": \"Journal A Update\",\n        \"publish_at\": \"lorem ipsum dolor\",\n        \"publish_date\": \"2019-09-09\",\n        \"tutor_id\": 83,\n        \"status\": 1\n    },\n    {\n        \"id\": 44,\n        \"journal_name\": \"Journal B Update\",\n        \"publish_at\": \"lorem ipsum dolor sit\",\n        \"publish_date\": \"2020-09-09\",\n        \"tutor_id\": 83,\n        \"status\": 1\n    },\n    {\n        \"id\": 45,\n        \"journal_name\": \"Journal C Update\",\n        \"publish_at\": \"lorem ipsum dolor sit amet\",\n        \"publish_date\": \"2020-09-09\",\n        \"tutor_id\": 83,\n        \"status\": 1\n    },\n    {\n        \"journal_name\": \"Journal D\",\n        \"publish_at\": \"lorem ipsum dolor sit\",\n        \"publish_date\": \"2018-09-09\",\n        \"tutor_id\": 83\n    }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/tutor/journals",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tutor",
+								"journals"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update/Create Researches",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n        \"id\": 25,\n        \"research_name\": \"Penelitian di A\",\n        \"description\": \"Lorem ipsum dolor sit, consectetur adipiscing elit, sed do\",\n        \"years\": 2020,\n        \"tutor_id\": 83,\n        \"status\": 1\n    },\n    {\n        \"id\": 26,\n        \"research_name\": \"Penelitian di B\",\n        \"description\": \"Lorem ipsum dolor sit, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore\",\n        \"years\": 2018,\n        \"tutor_id\": 83,\n        \"status\": 1\n    },\n    {\n        \"research_name\": \"Penelitian di C\",\n        \"description\": \"Lorem ipsum dolor sit ametah, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore\",\n        \"years\": 2020,\n        \"tutor_id\": 83\n    }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/tutor/researches",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tutor",
+								"researches"
 							]
 						}
 					},

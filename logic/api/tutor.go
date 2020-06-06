@@ -45,7 +45,7 @@ func GetTutorDetails(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Educations
-	sqlQueryEdu := "select id, univ_degree_id, univ_name, years from tutor_educations where tutor_id = ?"
+	sqlQueryEdu := "select id, univ_degree_id, univ_name, years from tutor_educations where status = 1 and tutor_id = ?"
 	res, err := db.Query(sqlQueryEdu, r.FormValue("tutor_id"))
 	defer mysql.CloseRows(res)
 
@@ -57,7 +57,7 @@ func GetTutorDetails(w http.ResponseWriter, r *http.Request) {
 	tutor.Education = edus
 
 	//Certificates
-	sqlQueryCert := "select id, cert_name, cert_date from tutor_certificates where tutor_id = ?"
+	sqlQueryCert := "select id, cert_name, cert_date from tutor_certificates where status = 1 and tutor_id = ?"
 	resCert, err := db.Query(sqlQueryCert, r.FormValue("tutor_id"))
 	defer mysql.CloseRows(resCert)
 
@@ -69,7 +69,7 @@ func GetTutorDetails(w http.ResponseWriter, r *http.Request) {
 	tutor.Certificate = certs
 
 	//Experiences
-	sqlQueryExp := "select id, exp_name, description, years from tutor_experiences where tutor_id = ?"
+	sqlQueryExp := "select id, exp_name, description, years from tutor_experiences where status = 1 and tutor_id = ?"
 	resExp, err := db.Query(sqlQueryExp, r.FormValue("tutor_id"))
 	defer mysql.CloseRows(resExp)
 
@@ -81,7 +81,7 @@ func GetTutorDetails(w http.ResponseWriter, r *http.Request) {
 	tutor.Experience = exps
 
 	//Journals
-	sqlQueryJour := "select id, journal_name, publish_at, publish_date from tutor_journals where tutor_id = ?"
+	sqlQueryJour := "select id, journal_name, publish_at, publish_date from tutor_journals where status = 1 and tutor_id = ?"
 	resJour, err := db.Query(sqlQueryJour, r.FormValue("tutor_id"))
 	defer mysql.CloseRows(resJour)
 
@@ -94,7 +94,7 @@ func GetTutorDetails(w http.ResponseWriter, r *http.Request) {
 	tutor.Journal = jours
 
 	//Researches
-	sqlQueryRes := "select id, res_name, description, years from tutor_researches where tutor_id = ?"
+	sqlQueryRes := "select id, res_name, description, years from tutor_researches where status = 1 and tutor_id = ?"
 	resRes, err := db.Query(sqlQueryRes, r.FormValue("tutor_id"))
 	defer mysql.CloseRows(resRes)
 
@@ -194,6 +194,352 @@ func GetTutor(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//UpdateTutorEducations is the func to create/update the education in tutor entity. please note that status = 0 (soft delete)
+func UpdateEducations(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var edus []structs.TutorEducation
+	var errstr structs.ErrorMessage
+	var queryStr string
+	var refId int
+
+	_ = json.NewDecoder(r.Body).Decode(&edus)
+
+	db := mysql.InitializeMySQL()
+	tx, err := db.Begin()
+
+	if err != nil {
+		tx.Rollback()
+		common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	insertEdu := "insert into tutor_educations (univ_degree_id, univ_name, years, status, tutor_id) values (?, ?, ?, ?, ?)"
+	updateEdu := "update tutor_educations set univ_degree_id = ?, univ_name = ?, years = ?, status = ?, updated_at = now(), updated_by = 'API' where id = ?"
+
+	j := 0
+	for range edus {
+		v := validator.New()
+		err = v.Struct(edus[j])
+		if err != nil {
+			tx.Rollback()
+			common.JSONError(w, structs.Validate, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if edus[j].ID != 0 {
+			queryStr = updateEdu
+			refId = edus[j].ID
+		} else {
+			queryStr = insertEdu
+			refId = edus[j].TutorID
+			edus[j].Status = 1
+		}
+
+		_, err2 := tx.Exec(queryStr, &edus[j].UnivDegreeID, &edus[j].UnivName, &edus[j].Years, &edus[j].Status, &refId)
+		if err2 != nil {
+			tx.Rollback()
+			common.JSONError(w, structs.QueryErr, err2.Error(), http.StatusInternalServerError)
+			return
+		}
+		j++
+	}
+
+	errstr.Message = structs.Success
+	errstr.Code = http.StatusOK
+	tx.Commit()
+	json.NewEncoder(w).Encode(errstr)
+}
+
+//UpdateTutorCertificates is the func to create/update the certificates in tutor entity. please note that status = 0 (soft delete)
+func UpdateCertificates(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var certs []structs.TutorCertificate
+	var errstr structs.ErrorMessage
+	var queryStr string
+	var refId int
+
+	_ = json.NewDecoder(r.Body).Decode(&certs)
+
+	db := mysql.InitializeMySQL()
+	tx, err := db.Begin()
+
+	if err != nil {
+		tx.Rollback()
+		common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	insertCert := "insert into tutor_certificates (cert_name, cert_date, status, tutor_id) values (?, ?, ?, ?)"
+	updateCert := "update tutor_certificates set cert_name = ?, cert_date = ?, status = ?, updated_at = now(), updated_by = 'API' where id = ?"
+
+	j := 0
+	for range certs {
+		v := validator.New()
+		err = v.Struct(certs[j])
+		if err != nil {
+			tx.Rollback()
+			common.JSONError(w, structs.Validate, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if certs[j].ID != 0 {
+			queryStr = updateCert
+			refId = certs[j].ID
+		} else {
+			queryStr = insertCert
+			refId = certs[j].TutorID
+			certs[j].Status = 1
+		}
+
+		_, err2 := tx.Exec(queryStr, &certs[j].CertName, &certs[j].CertDate, &certs[j].Status, &refId)
+		if err2 != nil {
+			tx.Rollback()
+			common.JSONError(w, structs.QueryErr, err2.Error(), http.StatusInternalServerError)
+			return
+		}
+		j++
+	}
+
+	errstr.Message = structs.Success
+	errstr.Code = http.StatusOK
+	tx.Commit()
+	json.NewEncoder(w).Encode(errstr)
+}
+
+//UpdateTutorExperiences is the func to create/update the experiences in tutor entity. please note that status = 0 (soft delete)
+func UpdateExperiences(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var exps []structs.TutorExperience
+	var errstr structs.ErrorMessage
+	var queryStr string
+	var refId int
+
+	_ = json.NewDecoder(r.Body).Decode(&exps)
+
+	db := mysql.InitializeMySQL()
+	tx, err := db.Begin()
+
+	if err != nil {
+		tx.Rollback()
+		common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	insertExp := "insert into tutor_experiences (exp_name, description, years, status, tutor_id) values (?, ?, ?, ?, ?)"
+	updateExp := "update tutor_experiences set exp_name = ?, description = ?, years = ?, status = ?, updated_at = now(), updated_by = 'API' where id = ?"
+
+	j := 0
+	for range exps {
+		v := validator.New()
+		err = v.Struct(exps[j])
+		if err != nil {
+			tx.Rollback()
+			common.JSONError(w, structs.Validate, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if exps[j].ID != 0 {
+			queryStr = updateExp
+			refId = exps[j].ID
+		} else {
+			queryStr = insertExp
+			refId = exps[j].TutorID
+			exps[j].Status = 1
+		}
+
+		_, err2 := tx.Exec(queryStr, &exps[j].ExpName, &exps[j].Description, &exps[j].Years, &exps[j].Status, &refId)
+		if err2 != nil {
+			tx.Rollback()
+			common.JSONError(w, structs.QueryErr, err2.Error(), http.StatusInternalServerError)
+			return
+		}
+		j++
+	}
+
+	errstr.Message = structs.Success
+	errstr.Code = http.StatusOK
+	tx.Commit()
+	json.NewEncoder(w).Encode(errstr)
+}
+
+//UpdateTutorJournals is the func to create/update the journal in tutor entity. please note that status = 0 (soft delete)
+func UpdateJournals(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var jours []structs.TutorJournal
+	var errstr structs.ErrorMessage
+	var queryStr string
+	var refId int
+
+	_ = json.NewDecoder(r.Body).Decode(&jours)
+
+	db := mysql.InitializeMySQL()
+	tx, err := db.Begin()
+
+	if err != nil {
+		tx.Rollback()
+		common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	insertJour := "insert into tutor_journals (journal_name, publish_at, publish_date, status, tutor_id) values (?, ?, ?, ?, ?)"
+	updateJour := "update tutor_journals set journal_name = ?, publish_at = ?, publish_date = ?, status = ?, updated_at = now(), updated_by = 'API' where id = ?"
+
+	j := 0
+	for range jours {
+		v := validator.New()
+		err = v.Struct(jours[j])
+		if err != nil {
+			tx.Rollback()
+			common.JSONError(w, structs.Validate, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if jours[j].ID != 0 {
+			queryStr = updateJour
+			refId = jours[j].ID
+		} else {
+			queryStr = insertJour
+			refId = jours[j].TutorID
+			jours[j].Status = 1
+		}
+
+		_, err2 := tx.Exec(queryStr, &jours[j].JourName, &jours[j].PublishAt, &jours[j].PublishDate, &jours[j].Status, &refId)
+		if err2 != nil {
+			tx.Rollback()
+			common.JSONError(w, structs.QueryErr, err2.Error(), http.StatusInternalServerError)
+			return
+		}
+		j++
+	}
+
+	errstr.Message = structs.Success
+	errstr.Code = http.StatusOK
+	tx.Commit()
+	json.NewEncoder(w).Encode(errstr)
+}
+
+//UpdateTutorResearches is the func to create/update the journal in tutor entity. please note that status = 0 (soft delete)
+func UpdateResearches(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var rschs []structs.TutorResearch
+	var errstr structs.ErrorMessage
+	var queryStr string
+	var refId int
+
+	_ = json.NewDecoder(r.Body).Decode(&rschs)
+
+	db := mysql.InitializeMySQL()
+	tx, err := db.Begin()
+
+	if err != nil {
+		tx.Rollback()
+		common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	insertRsch := "insert into tutor_researches (res_name, description, years, status, tutor_id) values (?, ?, ?, ?, ?)"
+	updateRsch := "update tutor_researches set res_name = ?, description = ?, years = ?, status = ?, updated_at = now(), updated_by = 'API' where id = ?"
+
+	j := 0
+	for range rschs {
+		v := validator.New()
+		err = v.Struct(rschs[j])
+		if err != nil {
+			tx.Rollback()
+			common.JSONError(w, structs.Validate, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if rschs[j].ID != 0 {
+			queryStr = updateRsch
+			refId = rschs[j].ID
+		} else {
+			queryStr = insertRsch
+			refId = rschs[j].TutorID
+			rschs[j].Status = 1
+		}
+
+		_, err2 := tx.Exec(queryStr, &rschs[j].ResName, &rschs[j].Description, &rschs[j].Years, &rschs[j].Status, &refId)
+		if err2 != nil {
+			tx.Rollback()
+			common.JSONError(w, structs.QueryErr, err2.Error(), http.StatusInternalServerError)
+			return
+		}
+		j++
+	}
+
+	errstr.Message = structs.Success
+	errstr.Code = http.StatusOK
+	tx.Commit()
+	json.NewEncoder(w).Encode(errstr)
+}
+
+//UpdateDetail is the func to create/update the journal in tutor entity. please note that status = 0 (soft delete)
+func UpdateDetail(w http.ResponseWriter, r *http.Request) {
+	/*
+		w.Header().Set("Content-Type", "application/json")
+
+		var det []structs.TutorDetails
+		var errstr structs.ErrorMessage
+		var queryStr string
+		var refId int
+
+		_ = json.NewDecoder(r.Body).Decode(&det)
+
+		db := mysql.InitializeMySQL()
+		tx, err := db.Begin()
+
+		if err != nil {
+			tx.Rollback()
+			common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		//updating email will update the username
+		insertDet := "insert into tutor_details (education_degree_front, education_degree_back, ktp, sim, npwp, gender_id, pob_id, dob, phone, email, street_address, address_id, institution_source_name, join_date, tutor_id, user_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+		updateDet := "update tutor_details set education_degree_front = ?, education_degree_back = ?, ktp = ?, sim = ?, npwp = ?, gender_id = ?, pob_id = ?, dob = ?, phone = ?, email = ?, street_address = ?, address_id, institution_source_name, join_date, tutor_id, user_id, updated_at = now(), updated_by = 'API' where id = ?"
+		updateUsr := "update users set username = ? where id = ?"
+
+		j := 0
+		for range rschs {
+			v := validator.New()
+			err = v.Struct(rschs[j])
+			if err != nil {
+				tx.Rollback()
+				common.JSONError(w, structs.Validate, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			if rschs[j].ID != 0 {
+				queryStr = updateRsch
+				refId = rschs[j].ID
+			} else {
+				queryStr = insertRsch
+				refId = rschs[j].TutorID
+				rschs[j].Status = 1
+			}
+
+			_, err2 := tx.Exec(queryStr, &rschs[j].ResName, &rschs[j].Description, &rschs[j].Years, &rschs[j].Status, &refId)
+			if err2 != nil {
+				tx.Rollback()
+				common.JSONError(w, structs.QueryErr, err2.Error(), http.StatusInternalServerError)
+				return
+			}
+			j++
+		}
+
+		errstr.Message = structs.Success
+		errstr.Code = http.StatusOK
+		tx.Commit()
+		json.NewEncoder(w).Encode(errstr)
+	*/
+}
+
 //CreateTutors is func that will insert multiple tutors at once (complete)
 func CreateTutors(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -239,7 +585,8 @@ func CreateTutors(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		lastTutorID, err := res.LastInsertId()
+		lastID, err := res.LastInsertId()
+		lastTutorID := int(lastID)
 		if err != nil {
 			tx.Rollback()
 			common.JSONError(w, structs.LastIDErr, err.Error(), http.StatusInternalServerError)
@@ -371,7 +718,7 @@ func CreateTutors(w http.ResponseWriter, r *http.Request) {
 }
 
 //UpdateTutors (multiple)
-func UpdateTutors(w http.ResponseWriter, r *http.Request) {
+func UpdateTutor(w http.ResponseWriter, r *http.Request) {
 
 }
 
