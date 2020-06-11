@@ -745,13 +745,3 @@ func CreateTutors(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(errstr)
 
 }
-
-//UpdateTutor (multiple)
-func UpdateTutor(w http.ResponseWriter, r *http.Request) {
-
-}
-
-//DeleteTutors (multiple). this func will soft-delete the data
-func DeleteTutors(w http.ResponseWriter, r *http.Request) {
-
-}

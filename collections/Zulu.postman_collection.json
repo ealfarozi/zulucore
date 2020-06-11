@@ -516,7 +516,8 @@
 								"v1",
 								"userlogin"
 							]
-						}
+						},
+						"description": "this api can be used to insert new user. username is the email used for logging in. in this api, we can also add user roles. (tutor, student, parents)"
 					},
 					"response": []
 				}

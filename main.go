@@ -32,6 +32,5 @@ func main() {
 	r.HandleFunc("/api/v1/login", api.Login).Methods("POST")
 
 	//3 - Run the server
-	//log.Fatal(http.ListenAndServe(":8000", r))
-	log.Fatal(http.ListenAndServe(":80", r))
+	log.Fatal(http.ListenAndServe(":8000", r))
 }
