@@ -12,6 +12,9 @@ func main() {
 	r := mux.NewRouter()
 
 	//2 - Route Handlers/Endpoints/URL endpoints/Service URL/Path
+	r.Handle("/api/v1/students", api.IsAuthorized(api.CreateStudents)).Methods("POST")
+	r.Handle("/api/v1/student", api.IsAuthorized(api.GetStudent)).Methods("GET")
+	r.Handle("/api/v1/students", api.IsAuthorized(api.GetStudents)).Methods("GET")
 	r.Handle("/api/v1/tutors", api.IsAuthorized(api.CreateTutors)).Methods("POST")
 	r.Handle("/api/v1/tutors", api.IsAuthorized(api.GetTutors)).Methods("GET")
 	r.Handle("/api/v1/tutor", api.IsAuthorized(api.GetTutor)).Methods("GET")

@@ -59,6 +59,26 @@ func CheckNomorInduk(insID int, nmrInduk string, tutorID int) int {
 	return check
 }
 
+func CheckNomorIndukStd(insID int, nmrInduk string, stdID int) int {
+	db := mysql.InitializeMySQL()
+	sqlQueryCheck := "SELECT count(1) FROM students std inner join (select user_id from user_roles where institution_id = ?) ur on std.user_id = ur.user_id where std.nomor_induk = ? "
+	check := 0
+	if stdID != 0 {
+		sqlQueryCheck += "and std.id != ?"
+		err := db.QueryRow(sqlQueryCheck, &insID, &nmrInduk, &stdID).Scan(&check)
+		if err != nil {
+			check = 99
+		}
+	} else {
+		err := db.QueryRow(sqlQueryCheck, &insID, &nmrInduk).Scan(&check)
+		if err != nil {
+			check = 99
+		}
+	}
+
+	return check
+}
+
 //CheckEmail is the func to check registered/updated email
 func CheckEmail(email string, usrID int) int {
 	db := mysql.InitializeMySQL()

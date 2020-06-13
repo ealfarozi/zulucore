@@ -167,8 +167,8 @@ func GetTutor(w http.ResponseWriter, r *http.Request) {
 	sqlQuery := "SELECT ttr.id, ttr.nomor_induk, ttr.name, ttr.tutor_type_id, ttr.user_id, ttr.status FROM tutors ttr inner join (select user_id from user_roles where institution_id = ?) ur on ttr.user_id = ur.user_id where "
 
 	if r.FormValue("nomor_induk") != "" {
-		sqlQuery += "ttr.nomor_induk = ?"
-		prm = r.FormValue("nomor_induk")
+		sqlQuery += "ttr.nomor_induk like ?"
+		prm = "%" + r.FormValue("nomor_induk") + "%"
 	}
 	if r.FormValue("name") != "" {
 		sqlQuery += "ttr.name like ?"

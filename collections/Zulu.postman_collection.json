@@ -28,7 +28,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\":\"superadmin@admin.com\",\n\t\"password\":\"12345678\"\n}",
+							"raw": "{\n\t\"username\":\"siswasd01@siswa.com\",\n\t\"password\":\"12345678\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -99,7 +99,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Tutor with Nomor Induk",
+					"name": "Get Tutor with Like Nomor Induk",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -499,7 +499,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n    {\n        \"username\": \"admin@admin16.com\",\n        \"password\": \"12345678\",\n        \"role_id\": 1,\n        \"institution_id\": 1\n    },\n    {\n        \"username\": \"admin@superadmin17.com\",\n        \"password\": \"12345678\"\n    }\n]",
+							"raw": "[\n    {\n        \"username\": \"siswasd@siswaSD01.com\",\n        \"password\": \"12345678\",\n        \"role_id\": 4,\n        \"institution_id\": 13\n    },\n    {\n        \"username\": \"siswasd@siswaSD02.com\",\n        \"password\": \"12345678\"\n    }\n]",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1152,6 +1152,183 @@
 								"api",
 								"v1",
 								"roles"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Student",
+			"item": [
+				{
+					"name": "Create Student with Details",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n        \"nomor_induk\": \"NoInduk_03\",\n        \"name\": \"Asep\",\n        \"degree_id\": 4,     \n        \"type_id\":1,   \n        \"curriculum_id\":1,\n        \"institution_id\": 13,\n        \"user_id\":30,\n        \"details\": {\n            \"kk_no\": \"KK-1283818203891028312\",\n            \"ktp\": \"1283818203891028312\",\n            \"sim\": \"1283182312312\",\n            \"npwp\": \"128379182731\",\n            \"gender_id\": 1,\n            \"pob_id\": 1000,\n            \"dob\": \"1990-05-05\",\n            \"phone\": \"081234567895\",\n            \"email\": \"asdasd@asd.com\",\n            \"street_address\": \"Jalan Raya ajah\",\n            \"address_map_id\": 7880,\n            \"institution_name\": \"TK Mekar Sari\",\n            \"join_date\": \"2000-01-01\"\n        }\n    },\n    {\n        \"nomor_induk\": \"NoInduk_04\",\n        \"name\": \"Dani\",\n        \"degree_id\": 5,     \n        \"type_id\":1,   \n        \"curriculum_id\":1,\n        \"institution_id\": 14,\n        \"details\": {\n            \"kk_no\": \"KK-1283818203891028DF\",                                    \n            \"gender_id\": 1,\n            \"pob_id\": 1000,\n            \"dob\": \"1990-05-05\",\n            \"phone\": \"081234567895\",\n            \"email\": \"asdasd@asd.com\",\n            \"street_address\": \"Jalan Raya ajah\",\n            \"address_map_id\": 7880,\n            \"institution_name\": \"Belum pernah sekolah\",\n            \"join_date\": \"2000-01-01\"\n        }\n    }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/students",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"students"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Student with Like Nomor Induk",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/student?institution_id=13&nomor_induk=No",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"student"
+							],
+							"query": [
+								{
+									"key": "institution_id",
+									"value": "13"
+								},
+								{
+									"key": "nomor_induk",
+									"value": "No"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Student List",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/students?institution_id=14",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"students"
+							],
+							"query": [
+								{
+									"key": "institution_id",
+									"value": "14"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Student with Like Name",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/student?institution_id=13&name=sep",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"student"
+							],
+							"query": [
+								{
+									"key": "institution_id",
+									"value": "13"
+								},
+								{
+									"key": "name",
+									"value": "sep"
+								}
 							]
 						}
 					},
