@@ -483,8 +483,7 @@ func UpdateResearches(w http.ResponseWriter, r *http.Request) {
 //UpdateDetail is the func to create/update the tutor detail (ONLY) on Frontend side for tutor entity. the update will includes nomor_induk and tutor_name as well
 //please note that status = 0 (soft delete). In order to create a new tutor please refer to CreateTutors func
 //email field should be coming from Login func
-func UpdateDetail(w http.ResponseWriter, r *http.Request) {
-
+func UpdateTutorDetails(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var tutors []structs.Tutor
