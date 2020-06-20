@@ -2,11 +2,17 @@ package main
 
 import (
 	router "github.com/ealfarozi/zulucore/http"
+	"github.com/ealfarozi/zulucore/interfaces"
 	"github.com/ealfarozi/zulucore/logic/api"
+	"github.com/ealfarozi/zulucore/repositories"
+	"github.com/ealfarozi/zulucore/service"
 )
 
 var (
-	httpRouter router.Router = router.NewMuxRouter()
+	httpRouter      router.Router              = router.NewMuxRouter()
+	tutorRepository interfaces.TutorRepository = repositories.NewMysqlRepository()
+	tutorService    service.TutorService       = service.NewTutorService(tutorRepository)
+	tutorLogic      api.TutorLogic             = api.NewTutorLogic(tutorService)
 )
 
 func main() {
@@ -22,10 +28,10 @@ func main() {
 	httpRouter.POST("/api/v1/institutions", api.CreateInstitutions)
 
 	httpRouter.POST("/api/v1/tutors", api.CreateTutors)
-	httpRouter.GET("/api/v1/tutors", api.GetTutors)
+	httpRouter.GET("/api/v1/tutors", tutorLogic.GetTutors)
 	httpRouter.GET("/api/v1/tutor", api.GetTutor)
 	httpRouter.POST("/api/v1/tutor/details", api.UpdateTutorDetails)
-	httpRouter.GET("/api/v1/tutor/details", api.GetTutorDetails)
+	httpRouter.GET("/api/v1/tutor/details", tutorLogic.GetTutorDetails)
 	httpRouter.POST("/api/v1/tutor/educations", api.UpdateEducations)
 	httpRouter.POST("/api/v1/tutor/experiences", api.UpdateExperiences)
 	httpRouter.POST("/api/v1/tutor/certificates", api.UpdateCertificates)

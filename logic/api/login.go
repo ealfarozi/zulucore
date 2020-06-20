@@ -10,6 +10,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/ealfarozi/zulucore/common"
 	"github.com/ealfarozi/zulucore/repositories/mysql"
+
 	"github.com/ealfarozi/zulucore/structs"
 	"golang.org/x/crypto/bcrypt"
 )

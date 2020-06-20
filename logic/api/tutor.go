@@ -7,7 +7,10 @@ import (
 	"net/http"
 
 	"github.com/ealfarozi/zulucore/common"
+	"github.com/ealfarozi/zulucore/interfaces"
+	"github.com/ealfarozi/zulucore/repositories"
 	"github.com/ealfarozi/zulucore/repositories/mysql"
+	"github.com/ealfarozi/zulucore/service"
 	"github.com/ealfarozi/zulucore/structs"
 	"gopkg.in/go-playground/validator.v9"
 
@@ -15,141 +18,48 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-//GetTutorDetails is the func to get all of the details that a tutor have. to get list of tutors, please use /api/v1/tutors
-func GetTutorDetails(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+type logic struct{}
 
-	var tutor structs.Tutor
-	var det structs.TutorDetails
-	var edus []structs.TutorEducation
-	var certs []structs.TutorCertificate
-	var exps []structs.TutorExperience
-	var jours []structs.TutorJournal
-	var rschs []structs.TutorResearch
+var (
+	tutorService service.TutorService
+	repo         interfaces.TutorRepository = repositories.NewMysqlRepository()
+)
 
-	db := mysql.InitializeMySQL()
-	sqlQueryTutor := "select id, nomor_induk, name, tutor_type_id, user_id, status from tutors where id = ?"
-	err := db.QueryRow(sqlQueryTutor, r.FormValue("tutor_id")).Scan(&tutor.ID, &tutor.NomorInduk, &tutor.Name, &tutor.TutorTypeID, &tutor.UserID, &tutor.Status)
-	if err != nil {
-		common.JSONError(w, structs.ErrNotFound, err.Error(), http.StatusInternalServerError)
-		return
-	}
+type TutorLogic interface {
+	GetTutors(w http.ResponseWriter, r *http.Request)
+	GetTutorDetails(w http.ResponseWriter, r *http.Request)
+}
 
-	//Details
-	sqlQueryDetail := "select id, education_degree_front, education_degree_back, ktp, sim, npwp, gender_id, pob_id, dob, phone, email, street_address, address_id, institution_source_name, join_date from tutor_details where tutor_id = ?"
-	resDet, err := db.Query(sqlQueryDetail, r.FormValue("tutor_id"))
-	defer mysql.CloseRows(resDet)
-	for resDet.Next() {
-		resDet.Scan(&det.ID, &det.EducationFront, &det.EducationBack, &det.Ktp, &det.Sim, &det.Npwp, &det.GenderID, &det.PobID, &det.Dob, &det.Phone, &det.Email, &det.StreetAddress, &det.AddressID, &det.InsSource, &det.JoinDate)
-		tutor.Details = &det
-		tutor.Details.AddressDetail = common.GetAddressOnly(det.AddressID)
-	}
-
-	//Educations
-	sqlQueryEdu := "select id, univ_degree_id, univ_name, years from tutor_educations where status = 1 and tutor_id = ?"
-	res, err := db.Query(sqlQueryEdu, r.FormValue("tutor_id"))
-	defer mysql.CloseRows(res)
-
-	edu := structs.TutorEducation{}
-	for res.Next() {
-		res.Scan(&edu.ID, &edu.UnivDegreeID, &edu.UnivName, &edu.Years)
-		edus = append(edus, edu)
-	}
-	tutor.Education = edus
-
-	//Certificates
-	sqlQueryCert := "select id, cert_name, cert_date from tutor_certificates where status = 1 and tutor_id = ?"
-	resCert, err := db.Query(sqlQueryCert, r.FormValue("tutor_id"))
-	defer mysql.CloseRows(resCert)
-
-	cert := structs.TutorCertificate{}
-	for resCert.Next() {
-		resCert.Scan(&cert.ID, &cert.CertName, &cert.CertDate)
-		certs = append(certs, cert)
-	}
-	tutor.Certificate = certs
-
-	//Experiences
-	sqlQueryExp := "select id, exp_name, description, years from tutor_experiences where status = 1 and tutor_id = ?"
-	resExp, err := db.Query(sqlQueryExp, r.FormValue("tutor_id"))
-	defer mysql.CloseRows(resExp)
-
-	exp := structs.TutorExperience{}
-	for resExp.Next() {
-		resExp.Scan(&exp.ID, &exp.ExpName, &exp.Description, &exp.Years)
-		exps = append(exps, exp)
-	}
-	tutor.Experience = exps
-
-	//Journals
-	sqlQueryJour := "select id, journal_name, publish_at, publish_date from tutor_journals where status = 1 and tutor_id = ?"
-	resJour, err := db.Query(sqlQueryJour, r.FormValue("tutor_id"))
-	defer mysql.CloseRows(resJour)
-
-	jour := structs.TutorJournal{}
-
-	for resJour.Next() {
-		resJour.Scan(&jour.ID, &jour.JourName, &jour.PublishAt, &jour.PublishDate)
-		jours = append(jours, jour)
-	}
-	tutor.Journal = jours
-
-	//Researches
-	sqlQueryRes := "select id, res_name, description, years from tutor_researches where status = 1 and tutor_id = ?"
-	resRes, err := db.Query(sqlQueryRes, r.FormValue("tutor_id"))
-	defer mysql.CloseRows(resRes)
-
-	rsch := structs.TutorResearch{}
-
-	for resRes.Next() {
-		resRes.Scan(&rsch.ID, &rsch.ResName, &rsch.Description, &rsch.Years)
-		rschs = append(rschs, rsch)
-	}
-	tutor.Research = rschs
-
-	/*
-		if len(edus) != 0 {
-			json.NewEncoder(w).Encode(tutors)
-		} else {
-			common.JSONError(w, structs.ErrNotFound, "", http.StatusInternalServerError)
-			return
-		}
-	*/
-
-	json.NewEncoder(w).Encode(tutor)
+func NewTutorLogic(service service.TutorService) TutorLogic {
+	tutorService = service
+	return &logic{}
 }
 
 //GetTutors in the db (all)
-func GetTutors(w http.ResponseWriter, r *http.Request) {
+func (*logic) GetTutors(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var tutors []structs.Tutor
+	tutors, errStr := repo.GetTutors(r.FormValue("institution_id"))
 
-	db := mysql.InitializeMySQL()
-
-	sqlQuery := "SELECT ttr.id, ttr.nomor_induk, ttr.name, ttr.tutor_type_id, ttr.user_id, ttr.status FROM tutors ttr inner join (select user_id from user_roles where institution_id = ?) ur on ttr.user_id = ur.user_id"
-
-	//var tutor structs.Tutor
-
-	res, err := db.Query(sqlQuery, r.FormValue("institution_id"))
-	defer mysql.CloseRows(res)
-	if err != nil {
-		common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
+	if errStr != nil {
+		common.JSONErr(w, errStr)
 		return
 	}
+	json.NewEncoder(w).Encode(tutors)
 
-	tutor := structs.Tutor{}
-	for res.Next() {
-		res.Scan(&tutor.ID, &tutor.NomorInduk, &tutor.Name, &tutor.TutorTypeID, &tutor.UserID, &tutor.Status)
-		tutors = append(tutors, tutor)
-	}
+}
 
-	if len(tutors) != 0 {
-		json.NewEncoder(w).Encode(tutors)
-	} else {
-		common.JSONError(w, structs.ErrNotFound, "", http.StatusInternalServerError)
+//GetTutorDetails in the db (by tutor ID)
+func (*logic) GetTutorDetails(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	tutors, errStr := repo.GetTutorDetails(r.FormValue("tutor_id"))
+
+	if errStr != nil {
+		common.JSONErr(w, errStr)
 		return
 	}
+	json.NewEncoder(w).Encode(tutors)
 
 }
 
