@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/ealfarozi/zulucore/common"
@@ -144,4 +145,319 @@ func (*repo) GetTutors(insID string) (*[]structs.Tutor, *structs.ErrorMessage) {
 		errors.Code = http.StatusInternalServerError
 		return nil, &errors
 	}
+}
+
+func (*repo) GetTutor(nmrInd string, name string, insID string) (*[]structs.Tutor, *structs.ErrorMessage) {
+	var prm string
+
+	var tutors []structs.Tutor
+	var errors structs.ErrorMessage
+
+	db := mysql.InitializeMySQL()
+
+	sqlQuery := "SELECT ttr.id, ttr.nomor_induk, ttr.name, ttr.tutor_type_id, ttr.user_id, ttr.status FROM tutors ttr inner join (select user_id from user_roles where institution_id = ?) ur on ttr.user_id = ur.user_id where "
+
+	if nmrInd != "" {
+		sqlQuery += "ttr.nomor_induk like ?"
+		prm = "%" + nmrInd + "%"
+	}
+	if name != "" {
+		sqlQuery += "ttr.name like ?"
+		prm = "%" + name + "%"
+	}
+	res, err := db.Query(sqlQuery, insID, prm)
+	defer mysql.CloseRows(res)
+	if err != nil {
+		errors.Message = structs.ErrNotFound
+		errors.SysMessage = err.Error()
+		errors.Code = http.StatusInternalServerError
+		return nil, &errors
+	}
+
+	tutor := structs.Tutor{}
+	for res.Next() {
+		res.Scan(&tutor.ID, &tutor.NomorInduk, &tutor.Name, &tutor.TutorTypeID, &tutor.UserID, &tutor.Status)
+		tutors = append(tutors, tutor)
+	}
+
+	if len(tutors) != 0 {
+		return &tutors, nil
+	} else {
+		errors.Message = structs.ErrNotFound
+		errors.SysMessage = ""
+		errors.Code = http.StatusInternalServerError
+		return nil, &errors
+
+	}
+}
+
+//UpdateTutorDetails is the func to create/update the tutor detail (ONLY) on Frontend side for tutor entity. The update will includes nomor_induk and tutor_name as well.
+//Please note that Tutor.status = 0 (soft delete). In order to create a new tutor please refer to CreateTutors func.
+//Email field should be coming from Login func.
+//Both of ID (tutor and tutor_details) are needed in this API
+func (*repo) UpdateTutorDetails(tutor structs.Tutor) *structs.ErrorMessage {
+	var errors structs.ErrorMessage
+
+	db := mysql.InitializeMySQL()
+	tx, err := db.Begin()
+
+	if err != nil {
+		tx.Rollback()
+		errors.Message = structs.QueryErr
+		errors.SysMessage = err.Error()
+		errors.Code = http.StatusInternalServerError
+		return &errors
+	}
+
+	//updating email will update the username in users table
+	insertDet := "insert into tutor_details (education_degree_front, education_degree_back, ktp, sim, npwp, gender_id, pob_id, dob, phone, email, street_address, address_id, institution_source_name, join_date, tutor_id, user_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	updateDet := "update tutor_details set education_degree_front = ?, education_degree_back = ?, ktp = ?, sim = ?, npwp = ?, gender_id = ?, pob_id = ?, dob = ?, phone = ?, email = ?, street_address = ?, address_id = ?, institution_source_name = ?, join_date = ?, updated_at = now(), updated_by = 'API' where id = ?"
+	updateTut := "update tutors set nomor_induk = ?, name = ?, tutor_type_id = ?, status = ? where id = ?"
+	updateUsr := "update users set username = ? where id = ?"
+
+	if tutor.Details.ID != 0 {
+		//update
+		_, err := tx.Exec(updateDet, &tutor.Details.EducationFront, &tutor.Details.EducationBack, &tutor.Details.Ktp, &tutor.Details.Sim, &tutor.Details.Npwp, &tutor.Details.GenderID, &tutor.Details.PobID, &tutor.Details.Dob, &tutor.Details.Phone, &tutor.Details.Email, &tutor.Details.StreetAddress, &tutor.Details.AddressID, &tutor.Details.InsSource, &tutor.Details.JoinDate, &tutor.Details.ID)
+		if err != nil {
+			tx.Rollback()
+			errors.Message = structs.QueryErr
+			errors.SysMessage = err.Error()
+			errors.Code = http.StatusInternalServerError
+			return &errors
+		}
+
+		_, err2 := tx.Exec(updateTut, &tutor.NomorInduk, &tutor.Name, &tutor.TutorTypeID, &tutor.Status, &tutor.ID)
+		if err2 != nil {
+			tx.Rollback()
+			errors.Message = structs.QueryErr
+			errors.SysMessage = err2.Error()
+			errors.Code = http.StatusInternalServerError
+			return &errors
+		}
+
+		_, err3 := tx.Exec(updateUsr, &tutor.Details.Email, &tutor.UserID)
+		if err3 != nil {
+			tx.Rollback()
+			errors.Message = structs.QueryErr
+			errors.SysMessage = err3.Error()
+			errors.Code = http.StatusInternalServerError
+			return &errors
+		}
+
+	} else {
+		//insert
+		_, err := tx.Exec(insertDet, &tutor.Details.EducationFront, &tutor.Details.EducationBack, &tutor.Details.Ktp, &tutor.Details.Sim, &tutor.Details.Npwp, &tutor.Details.GenderID, &tutor.Details.PobID, &tutor.Details.Dob, &tutor.Details.Phone, &tutor.Details.Email, &tutor.Details.StreetAddress, &tutor.Details.AddressID, &tutor.Details.InsSource, &tutor.Details.JoinDate, &tutor.ID, &tutor.UserID)
+		if err != nil {
+			tx.Rollback()
+			errors.Message = structs.QueryErr
+			errors.SysMessage = err.Error()
+			errors.Code = http.StatusInternalServerError
+			return &errors
+		}
+	}
+
+	errors.Message = structs.Success
+	errors.Code = http.StatusOK
+	tx.Commit()
+	return &errors
+}
+
+//CreateTutors is the func that will insert multiple tutors at once (complete).
+//please note that the email in request parameter is the username coming from Login func
+func (*repo) CreateTutors(tutor structs.Tutor) *structs.ErrorMessage {
+	var errors structs.ErrorMessage
+
+	db := mysql.InitializeMySQL()
+	tx, err := db.Begin()
+
+	//start checking insert
+	if err != nil {
+		tx.Rollback()
+		errors.Message = structs.QueryErr
+		errors.SysMessage = err.Error()
+		errors.Code = http.StatusInternalServerError
+		return &errors
+	}
+
+	sqlQuery := "insert into tutors (nomor_induk, name, tutor_type_id, user_id) values (?, ?, ?, ?)"
+	res, err := tx.Exec(sqlQuery, &tutor.NomorInduk, &tutor.Name, &tutor.TutorTypeID, &tutor.UserID)
+	if err != nil {
+		tx.Rollback()
+		errors.Message = structs.QueryErr
+		errors.SysMessage = err.Error()
+		errors.Code = http.StatusInternalServerError
+		return &errors
+	}
+
+	lastID, err := res.LastInsertId()
+	lastTutorID := int(lastID)
+	if err != nil {
+		tx.Rollback()
+		errors.Message = structs.LastIDErr
+		errors.SysMessage = err.Error()
+		errors.Code = http.StatusInternalServerError
+		return &errors
+	}
+
+	//insert details
+	if tutor.Details != nil {
+		tutor.Details.TutorID = lastTutorID
+		tutor.Details.UserID = tutor.UserID
+
+		sqlQueryDetail := "insert into tutor_details (education_degree_front, education_degree_back, ktp, sim, npwp, gender_id, pob_id, dob, phone, email, street_address, address_id, institution_source_name, join_date, tutor_id, user_id ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+		res, err := tx.Exec(sqlQueryDetail, &tutor.Details.EducationFront, &tutor.Details.EducationBack, &tutor.Details.Ktp, &tutor.Details.Sim, &tutor.Details.Npwp, &tutor.Details.GenderID, &tutor.Details.PobID, &tutor.Details.Dob, &tutor.Details.Phone, &tutor.Details.Email, &tutor.Details.StreetAddress, &tutor.Details.AddressID, &tutor.Details.InsSource, &tutor.Details.JoinDate, &lastTutorID, &tutor.UserID)
+		if err != nil {
+			tx.Rollback()
+			errors.Message = structs.QueryErr
+			errors.SysMessage = err.Error()
+			errors.Code = http.StatusInternalServerError
+			return &errors
+		}
+
+		lastID, err := res.LastInsertId()
+		if err != nil {
+			tx.Rollback()
+			errors.Message = structs.LastIDErr
+			errors.SysMessage = err.Error()
+			errors.Code = http.StatusInternalServerError
+			log.Println(lastID)
+			return &errors
+		}
+	}
+
+	//insert educations
+	k := 0
+	if len(tutor.Education) != 0 {
+		sqlQueryEdu := "insert into tutor_educations (univ_degree_id, univ_name, years, tutor_id) values (?, ?, ?, ?)"
+		for range tutor.Education {
+			tutor.Education[k].TutorID = lastTutorID
+
+			_, err2 := tx.Exec(sqlQueryEdu, &tutor.Education[k].UnivDegreeID, &tutor.Education[k].UnivName, &tutor.Education[k].Years, &lastTutorID)
+			if err2 != nil {
+				tx.Rollback()
+				errors.Message = structs.QueryErr
+				errors.SysMessage = err2.Error()
+				errors.Code = http.StatusInternalServerError
+				return &errors
+			}
+			k++
+		}
+	}
+
+	//insert certificates
+	m := 0
+	if len(tutor.Certificate) != 0 {
+		sqlQueryCert := "insert into tutor_certificates (cert_name, cert_date, tutor_id) values (?, ?, ?)"
+		for range tutor.Certificate {
+			tutor.Certificate[m].TutorID = lastTutorID
+
+			_, err2 := tx.Exec(sqlQueryCert, &tutor.Certificate[m].CertName, &tutor.Certificate[m].CertDate, &lastTutorID)
+			if err2 != nil {
+				tx.Rollback()
+				errors.Message = structs.QueryErr
+				errors.SysMessage = err.Error()
+				errors.Code = http.StatusInternalServerError
+				return &errors
+			}
+			m++
+		}
+	}
+
+	//insert Experiences
+	n := 0
+	if len(tutor.Experience) != 0 {
+		sqlQueryExp := "insert into tutor_experiences (exp_name, description, years, tutor_id) values (?, ?, ?, ?)"
+		for range tutor.Experience {
+			tutor.Experience[n].TutorID = lastTutorID
+
+			_, err2 := tx.Exec(sqlQueryExp, &tutor.Experience[n].ExpName, &tutor.Experience[n].Description, &tutor.Experience[n].Years, &lastTutorID)
+			if err2 != nil {
+				tx.Rollback()
+				errors.Message = structs.QueryErr
+				errors.SysMessage = err2.Error()
+				errors.Code = http.StatusInternalServerError
+				return &errors
+			}
+			n++
+		}
+	}
+
+	//insert Journal
+	p := 0
+	if len(tutor.Journal) != 0 {
+		sqlQueryJour := "insert into tutor_journals (journal_name, publish_at, publish_date, tutor_id) values (?, ?, ?, ?)"
+		for range tutor.Journal {
+			tutor.Journal[p].TutorID = lastTutorID
+
+			_, err2 := tx.Exec(sqlQueryJour, &tutor.Journal[p].JourName, &tutor.Journal[p].PublishAt, &tutor.Journal[p].PublishDate, &lastTutorID)
+			if err2 != nil {
+				tx.Rollback()
+				errors.Message = structs.QueryErr
+				errors.SysMessage = err.Error()
+				errors.Code = http.StatusInternalServerError
+				return &errors
+			}
+			p++
+		}
+	}
+
+	//insert research
+	a := 0
+	if len(tutor.Research) != 0 {
+		sqlQueryRes := "insert into tutor_researches (res_name, description, years, tutor_id) values (?, ?, ?, ?)"
+		for range tutor.Research {
+			tutor.Research[a].TutorID = lastTutorID
+
+			_, err2 := tx.Exec(sqlQueryRes, &tutor.Research[a].ResName, &tutor.Research[a].Description, &tutor.Research[a].Years, &lastTutorID)
+			if err2 != nil {
+				tx.Rollback()
+				errors.Message = structs.QueryErr
+				errors.SysMessage = err2.Error()
+				errors.Code = http.StatusInternalServerError
+				return &errors
+			}
+			a++
+		}
+	}
+
+	errors.Message = structs.Success
+	errors.Code = http.StatusOK
+
+	tx.Commit()
+	return &errors
+
+}
+
+//CheckEmail is the func to check registered/updated email
+func (*repo) CheckEmail(email string, usrID int) int {
+	db := mysql.InitializeMySQL()
+	sqlQueryCheck := "select count(1) from users where username = ? and id != ?"
+	check := 0
+	err := db.QueryRow(sqlQueryCheck, &email, &usrID).Scan(&check)
+
+	if err != nil {
+		check = 99
+	}
+	return check
+}
+
+//checkNomorInduk is the func to check registered/updated nomor induk
+func (*repo) CheckNomorInduk(insID int, nmrInduk string, tutorID int) int {
+	db := mysql.InitializeMySQL()
+	sqlQueryCheck := "SELECT count(1) FROM tutors ttr inner join (select user_id from user_roles where institution_id = ?) ur on ttr.user_id = ur.user_id where ttr.nomor_induk = ? "
+	check := 0
+	if tutorID != 0 {
+		sqlQueryCheck += "and ttr.id != ?"
+		err := db.QueryRow(sqlQueryCheck, &insID, &nmrInduk, &tutorID).Scan(&check)
+		if err != nil {
+			check = 99
+		}
+	} else {
+		err := db.QueryRow(sqlQueryCheck, &insID, &nmrInduk).Scan(&check)
+		if err != nil {
+			check = 99
+		}
+	}
+
+	return check
 }

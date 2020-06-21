@@ -36,8 +36,8 @@ type TutorDetails struct {
 	Email          string  `json:"email"  validate:"required,email"`
 	InsSource      string  `json:"institution_name,omitempty"`
 	JoinDate       string  `json:"join_date,omitempty"`
-	TutorID        int     `json:"tutor_id,omitempty" validate:"required"`
-	UserID         int     `json:"user_id,omitempty" validate:"required"`
+	TutorID        int     `json:"tutor_id,omitempty"`
+	UserID         int     `json:"user_id,omitempty"`
 	StreetAddress  string  `json:"street_address,omitempty"`
 	AddressID      int     `json:"address_map_id,omitempty"`
 	AddressDetail  Address `json:"address_detail,omitempty"`
@@ -49,7 +49,7 @@ type TutorEducation struct {
 	UnivDegreeID int    `json:"univ_degree_id" validate:"required"`
 	UnivName     string `json:"univ_name" validate:"required"`
 	Years        int    `json:"years" validate:"required"`
-	TutorID      int    `json:"tutor_id,omitempty" validate:"required"`
+	TutorID      int    `json:"tutor_id,omitempty"`
 	Status       int    `json:"status,omitempty"`
 }
 
@@ -58,7 +58,7 @@ type TutorCertificate struct {
 	ID       int    `json:"id,omitempty"`
 	CertName string `json:"cert_name" validate:"required"`
 	CertDate string `json:"cert_date" validate:"required"`
-	TutorID  int    `json:"tutor_id,omitempty" validate:"required"`
+	TutorID  int    `json:"tutor_id,omitempty"`
 	Status   int    `json:"status,omitempty"`
 }
 
@@ -68,7 +68,7 @@ type TutorExperience struct {
 	ExpName     string `json:"exp_name" validate:"required"`
 	Description string `json:"description" validate:"required"`
 	Years       int    `json:"years" validate:"required"`
-	TutorID     int    `json:"tutor_id,omitempty" validate:"required"`
+	TutorID     int    `json:"tutor_id,omitempty"`
 	Status      int    `json:"status,omitempty"`
 }
 
@@ -78,7 +78,7 @@ type TutorResearch struct {
 	ResName     string `json:"research_name" validate:"required"`
 	Description string `json:"description" validate:"required"`
 	Years       int    `json:"years" validate:"required"`
-	TutorID     int    `json:"tutor_id,omitempty" validate:"required"`
+	TutorID     int    `json:"tutor_id,omitempty"`
 	Status      int    `json:"status,omitempty"`
 }
 
@@ -88,6 +88,6 @@ type TutorJournal struct {
 	JourName    string `json:"journal_name" validate:"required"`
 	PublishAt   string `json:"publish_at" validate:"required"`
 	PublishDate string `json:"publish_date" validate:"required"`
-	TutorID     int    `json:"tutor_id,omitempty" validate:"required"`
+	TutorID     int    `json:"tutor_id,omitempty"`
 	Status      int    `json:"status,omitempty"`
 }

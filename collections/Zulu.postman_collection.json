@@ -28,7 +28,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\":\"siswasd01@siswa.com\",\n\t\"password\":\"12345678\"\n}",
+							"raw": "{\n\t\"username\":\"admin@superadmin.com\",\n\t\"password\":\"12345678\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -193,6 +193,50 @@
 					"response": []
 				},
 				{
+					"name": "Get Tutor Details with Tutor ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/tutor/details?tutor_id=83",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tutor",
+								"details"
+							],
+							"query": [
+								{
+									"key": "tutor_id",
+									"value": "83"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create Tutor Complete",
 					"request": {
 						"method": "POST",
@@ -239,7 +283,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n    {\n    \t\"ID\":47,\n        \"nomor_induk\": \"INDK-003\",\n        \"name\": \"Test Lagi\",\n        \"type\": 1,\n        \"user_id\": 1,\n        \"institution_id\": 1,\n        \"details\": {\n            \"degree_front\": \"Prof\",\n            \"degree_back\": \"S.Kom\",\n            \"ktp\": \"1283818203891028312\",\n            \"sim\": \"1283182312312\",\n            \"npwp\": \"128379182731\",\n            \"gender_id\": 2,\n            \"pob_id\": 1000,\n            \"dob\": \"1990-05-05\",\n            \"phone\": \"081234567895\",\n            \"email\": \"admin@superadmin16.com\",\n            \"street_address\": \"Jalan Raya ajah\",\n            \"address_map_id\": 7880,\n            \"institution_name\": \"Universitas Bukan Sembarangan\",\n            \"join_date\": \"2000-01-01\",\n            \"tutor_id\":125,\n            \"user_id\":9\n        }\n    },\n    {\n    \t\"ID\":131,\n        \"nomor_induk\": \"INDK-004\",\n        \"name\": \"Test Aja\",\n        \"type\": 1,\n        \"user_id\": 21,\n        \"institution_id\": 1,\n        \"details\": {\n        \t\"ID\":50,\n            \"degree_front\": \"Prof\",\n            \"degree_back\": \"S.Kom\",\n            \"ktp\": \"1283818203891028312\",\n            \"sim\": \"1283182312312\",\n            \"npwp\": \"128379182731\",\n            \"gender_id\": 2,\n            \"pob_id\": 1000,\n            \"dob\": \"1990-05-05\",\n            \"phone\": \"081234567895\",\n            \"email\": \"admin@superadmin4567.com\",\n            \"street_address\": \"Jalan Raya ajah\",\n            \"address_map_id\": 7880,\n            \"institution_name\": \"Universitas Bukan Sembarangan\",\n            \"join_date\": \"2000-01-01\",\n            \"tutor_id\":131,\n            \"user_id\":21\n        }\n    }\n]",
+							"raw": "[\n    {\n        \"ID\": 89,\n        \"nomor_induk\": \"INDK-0041\",\n        \"name\": \"Test Lagi\",\n        \"type\": 1,\n        \"user_id\": 1,\n        \"institution_id\": 1,\n        \"status\": 1,\n        \"details\": {\n            \"ID\": 14,\n            \"degree_front\": \"Prof\",\n            \"degree_back\": \"S.Kom\",\n            \"ktp\": \"1283818203891028312\",\n            \"sim\": \"1283182312312\",\n            \"npwp\": \"128379182731\",\n            \"gender_id\": 2,\n            \"pob_id\": 1000,\n            \"dob\": \"1990-05-05\",\n            \"phone\": \"081234567895\",\n            \"email\": \"admin@superadmin16.com\",\n            \"street_address\": \"Jalan Rayaah\",\n            \"address_map_id\": 7880,\n            \"institution_name\": \"Universitas Bukan Sembarangan\",\n            \"join_date\": \"2000-01-01\",\n            \"tutor_id\": 125,\n            \"user_id\": 9\n        }\n    },\n    {\n        \"ID\": 131,\n        \"nomor_induk\": \"INDK-004\",\n        \"name\": \"Test Aja\",\n        \"type\": 1,\n        \"user_id\": 21,\n        \"institution_id\": 1,\n        \"status\": 1,\n        \"details\": {\n            \"ID\": 26,\n            \"degree_front\": \"Prof\",\n            \"degree_back\": \"S.Kom\",\n            \"ktp\": \"1283818203891028312\",\n            \"sim\": \"1283182312312\",\n            \"npwp\": \"128379182731\",\n            \"gender_id\": 2,\n            \"pob_id\": 1000,\n            \"dob\": \"1990-05-05\",\n            \"phone\": \"081234567895\",\n            \"email\": \"admin@superadmin4567.com\",\n            \"street_address\": \"Jalan Raya ajah\",\n            \"address_map_id\": 7880,\n            \"institution_name\": \"Universitas Bukan Sembarangan\",\n            \"join_date\": \"2000-01-01\",\n            \"tutor_id\": 131,\n            \"user_id\": 21\n        }\n    }\n]",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -436,49 +480,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Get Tutor Details with Tutor ID",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"type": "text",
-								"value": "{{token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/api/v1/tutordetails?tutor_id=83",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"tutordetails"
-							],
-							"query": [
-								{
-									"key": "tutor_id",
-									"value": "83"
-								}
-							]
-						}
-					},
-					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -499,7 +500,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n    {\n        \"username\": \"siswasd@siswaSD01.com\",\n        \"password\": \"12345678\",\n        \"role_id\": 4,\n        \"institution_id\": 13\n    },\n    {\n        \"username\": \"siswasd@siswaSD02.com\",\n        \"password\": \"12345678\"\n    }\n]",
+							"raw": "[\n    {\n        \"username\": \"siswasd@siswaSD03.com\",\n        \"password\": \"12345678\",\n        \"role_id\": 4,\n        \"institution_id\": 13\n    },\n    {\n        \"username\": \"siswasd@siswaSD04.com\",\n        \"password\": \"12345678\"\n    }\n]",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1198,6 +1199,42 @@
 					"response": []
 				},
 				{
+					"name": "Create/Update Student Details",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n    \"id\": 93,\n    \"nomor_induk\": \"NoInduk_01\",\n    \"name\": \"Asep\",\n    \"degree_id\": 4,\n    \"type_id\": 1,\n    \"institution_id\":13,\n    \"curriculum_id\": 1,\n    \"user_id\": 28,\n    \"status\": 1,\n    \"details\": {\n        \"id\": 26,\n        \"kk_no\": \"KK-12838182\",\n        \"ktp\": \"12838182\",\n        \"sim\": \"1283182312312\",\n        \"npwp\": \"128379182731\",\n        \"gender_id\": 1,\n        \"pob_id\": 1000,\n        \"dob\": \"1990-05-05\",\n        \"phone\": \"081234567895\",\n        \"email\": \"asdasd@asd.com\",\n        \"institution_name\": \"TK Mekar Sari\",\n        \"join_date\": \"2000-01-01\",\n        \"street_address\": \"Jalan Raya ajah\",\n        \"address_map_id\": 7880\n    }\n}\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/student/details",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"student",
+								"details"
+							]
+						},
+						"description": "to update the tutor details and create the tutor details. this api can be used when the tutor is already registered. for insert tutor and insert tutor details please use \"Create Tutor Complete\""
+					},
+					"response": []
+				},
+				{
 					"name": "Get Student with Like Nomor Induk",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -1328,6 +1365,50 @@
 								{
 									"key": "name",
 									"value": "sep"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Student Details with Student ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/student/details?student_id=93",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"student",
+								"details"
+							],
+							"query": [
+								{
+									"key": "student_id",
+									"value": "93"
 								}
 							]
 						}

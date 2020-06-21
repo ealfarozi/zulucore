@@ -27,10 +27,10 @@ func main() {
 	httpRouter.GET("/api/v1/institutions", api.GetInstitutions)
 	httpRouter.POST("/api/v1/institutions", api.CreateInstitutions)
 
-	httpRouter.POST("/api/v1/tutors", api.CreateTutors)
+	httpRouter.POST("/api/v1/tutors", tutorLogic.CreateTutors)
 	httpRouter.GET("/api/v1/tutors", tutorLogic.GetTutors)
-	httpRouter.GET("/api/v1/tutor", api.GetTutor)
-	httpRouter.POST("/api/v1/tutor/details", api.UpdateTutorDetails)
+	httpRouter.GET("/api/v1/tutor", tutorLogic.GetTutor)
+	httpRouter.POST("/api/v1/tutor/details", tutorLogic.UpdateTutorDetails)
 	httpRouter.GET("/api/v1/tutor/details", tutorLogic.GetTutorDetails)
 	httpRouter.POST("/api/v1/tutor/educations", api.UpdateEducations)
 	httpRouter.POST("/api/v1/tutor/experiences", api.UpdateExperiences)

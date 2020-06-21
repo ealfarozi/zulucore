@@ -2,8 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/ealfarozi/zulucore/common"
@@ -28,6 +26,9 @@ var (
 type TutorLogic interface {
 	GetTutors(w http.ResponseWriter, r *http.Request)
 	GetTutorDetails(w http.ResponseWriter, r *http.Request)
+	GetTutor(w http.ResponseWriter, r *http.Request)
+	UpdateTutorDetails(w http.ResponseWriter, r *http.Request)
+	CreateTutors(w http.ResponseWriter, r *http.Request)
 }
 
 func NewTutorLogic(service service.TutorService) TutorLogic {
@@ -39,7 +40,7 @@ func NewTutorLogic(service service.TutorService) TutorLogic {
 func (*logic) GetTutors(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	tutors, errStr := repo.GetTutors(r.FormValue("institution_id"))
+	tutors, errStr := tutorService.GetTutors(r.FormValue("institution_id"))
 
 	if errStr != nil {
 		common.JSONErr(w, errStr)
@@ -53,7 +54,7 @@ func (*logic) GetTutors(w http.ResponseWriter, r *http.Request) {
 func (*logic) GetTutorDetails(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	tutors, errStr := repo.GetTutorDetails(r.FormValue("tutor_id"))
+	tutors, errStr := tutorService.GetTutorDetails(r.FormValue("tutor_id"))
 
 	if errStr != nil {
 		common.JSONErr(w, errStr)
@@ -64,45 +65,17 @@ func (*logic) GetTutorDetails(w http.ResponseWriter, r *http.Request) {
 }
 
 //GetTutor in the db based on nomor_induk parameter (search tutor)
-func GetTutor(w http.ResponseWriter, r *http.Request) {
+func (*logic) GetTutor(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	var prm string
 
-	//params := mux.Vars(r) //get params
+	tutors, errStr := tutorService.GetTutor(r.FormValue("nomor_induk"), r.FormValue("name"), r.FormValue("institution_id"))
 
-	tutors := []structs.Tutor{}
-	db := mysql.InitializeMySQL()
-
-	//sqlQuery := "SELECT id, nomor_induk, name, tutor_type_id, user_id, status FROM tutors where "
-	sqlQuery := "SELECT ttr.id, ttr.nomor_induk, ttr.name, ttr.tutor_type_id, ttr.user_id, ttr.status FROM tutors ttr inner join (select user_id from user_roles where institution_id = ?) ur on ttr.user_id = ur.user_id where "
-
-	if r.FormValue("nomor_induk") != "" {
-		sqlQuery += "ttr.nomor_induk like ?"
-		prm = "%" + r.FormValue("nomor_induk") + "%"
-	}
-	if r.FormValue("name") != "" {
-		sqlQuery += "ttr.name like ?"
-		prm = "%" + r.FormValue("name") + "%"
-	}
-	res, err := db.Query(sqlQuery, r.FormValue("institution_id"), prm)
-	defer mysql.CloseRows(res)
-	if err != nil {
-		common.JSONError(w, structs.ErrNotFound, err.Error(), http.StatusInternalServerError)
+	if errStr != nil {
+		common.JSONErr(w, errStr)
 		return
 	}
+	json.NewEncoder(w).Encode(tutors)
 
-	tutor := structs.Tutor{}
-	for res.Next() {
-		res.Scan(&tutor.ID, &tutor.NomorInduk, &tutor.Name, &tutor.TutorTypeID, &tutor.UserID, &tutor.Status)
-		tutors = append(tutors, tutor)
-	}
-
-	if len(tutors) != 0 {
-		json.NewEncoder(w).Encode(tutors)
-	} else {
-		common.JSONError(w, structs.ErrNotFound, "", http.StatusInternalServerError)
-		return
-	}
 }
 
 //UpdateEducations is the func to create/update the education in tutor entity. please note that status = 0 (soft delete)
@@ -390,102 +363,104 @@ func UpdateResearches(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(errstr)
 }
 
-//UpdateDetail is the func to create/update the tutor detail (ONLY) on Frontend side for tutor entity. the update will includes nomor_induk and tutor_name as well
-//please note that status = 0 (soft delete). In order to create a new tutor please refer to CreateTutors func
-//email field should be coming from Login func
-func UpdateTutorDetails(w http.ResponseWriter, r *http.Request) {
+//UpdateTutorDetails is the func to create/update the tutor detail (ONLY) on Frontend side for tutor entity. The update will includes nomor_induk and tutor_name as well.
+//Please note that Tutor.status = 0 (soft delete). In order to create a new tutor please refer to CreateTutors func.
+//Email field should be coming from Login func.
+//Both of ID (tutor and tutor_details) are needed in this API
+func (*logic) UpdateTutorDetails(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
 	var tutors []structs.Tutor
-	var errstr structs.ErrorMessage
 
 	_ = json.NewDecoder(r.Body).Decode(&tutors)
 
-	db := mysql.InitializeMySQL()
-	tx, err := db.Begin()
+	j := 0
+	for range tutors {
+		tutor, errStr := tutorService.Validate(&tutors[j])
+		if errStr != nil {
+			common.JSONErr(w, errStr)
+			return
+		}
 
-	if err != nil {
-		tx.Rollback()
-		common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-		return
+		if tutor.ID == 0 {
+			errStr := structs.ErrorMessage{Message: structs.EmptyID, SysMessage: "", Code: http.StatusInternalServerError}
+			common.JSONErr(w, &errStr)
+			return
+		}
+
+		checkNomorInduk := tutorService.CheckNomorInduk(tutors[j].InsID, tutors[j].NomorInduk, tutors[j].ID)
+		if checkNomorInduk != 0 {
+			errStr := structs.ErrorMessage{Message: structs.NomorInd, SysMessage: "", Code: http.StatusInternalServerError}
+			common.JSONErr(w, &errStr)
+			return
+		}
+
+		checkEmail := tutorService.CheckEmail(tutors[j].Details.Email, tutors[j].UserID)
+		if checkEmail != 0 {
+			errStr := structs.ErrorMessage{Message: structs.Email, SysMessage: "", Code: http.StatusInternalServerError}
+			common.JSONErr(w, &errStr)
+			return
+		}
+
+		//insert or update
+		errStr = tutorService.UpdateTutorDetails(*tutor)
+		if errStr.Code != http.StatusOK {
+			common.JSONErr(w, errStr)
+			return
+		}
+		j++
 	}
+	errStr := structs.ErrorMessage{Message: structs.Success, SysMessage: "", Code: http.StatusOK}
+	common.JSONErr(w, &errStr)
+	return
+}
 
-	//updating email will update the username in users table
-	insertDet := "insert into tutor_details (education_degree_front, education_degree_back, ktp, sim, npwp, gender_id, pob_id, dob, phone, email, street_address, address_id, institution_source_name, join_date, tutor_id, user_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-	updateDet := "update tutor_details set education_degree_front = ?, education_degree_back = ?, ktp = ?, sim = ?, npwp = ?, gender_id = ?, pob_id = ?, dob = ?, phone = ?, email = ?, street_address = ?, address_id = ?, institution_source_name = ?, join_date = ?, updated_at = now(), updated_by = 'API' where id = ?"
-	updateTut := "update tutors set nomor_induk = ?, name = ?, tutor_type_id = ?, status = ? where id = ?"
-	updateUsr := "update users set username = ? where id = ?"
+//CreateTutors is the func that will insert multiple tutors at once (complete).
+//please note that the email in request parameter is the username coming from Login func
+func (*logic) CreateTutors(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var tutors []structs.Tutor
+
+	_ = json.NewDecoder(r.Body).Decode(&tutors)
 
 	j := 0
 	for range tutors {
-		v := validator.New()
-		err = v.Struct(tutors[j])
-		if err != nil {
-			tx.Rollback()
-			common.JSONError(w, structs.Validate, err.Error(), http.StatusInternalServerError)
+		tutor, errStr := tutorService.Validate(&tutors[j])
+		if errStr != nil {
+			common.JSONErr(w, errStr)
 			return
 		}
 
-		checkNmrInduk := common.CheckNomorInduk(tutors[j].InsID, tutors[j].NomorInduk, tutors[j].ID)
-
-		if checkNmrInduk != 0 {
-			tx.Rollback()
-			common.JSONError(w, structs.NomorInd, "", http.StatusInternalServerError)
+		checkNomorInduk := common.CheckNomorInduk(tutors[j].InsID, tutors[j].NomorInduk, 0)
+		if checkNomorInduk != 0 {
+			errStr := structs.ErrorMessage{Message: structs.NomorInd, SysMessage: "", Code: http.StatusInternalServerError}
+			common.JSONErr(w, &errStr)
 			return
 		}
 
-		checkEmail := common.CheckEmail(tutors[j].Details.Email, tutors[j].UserID)
-
+		checkEmail := tutorService.CheckEmail(tutors[j].Details.Email, tutors[j].UserID)
 		if checkEmail != 0 {
-			tx.Rollback()
-			common.JSONError(w, structs.Email, "", http.StatusInternalServerError)
+			errStr := structs.ErrorMessage{Message: structs.Email, SysMessage: "", Code: http.StatusInternalServerError}
+			common.JSONErr(w, &errStr)
 			return
 		}
 
-		if tutors[j].ID != 0 {
-			//update
-			_, err := tx.Exec(updateDet, &tutors[j].Details.EducationFront, &tutors[j].Details.EducationBack, &tutors[j].Details.Ktp, &tutors[j].Details.Sim, &tutors[j].Details.Npwp, &tutors[j].Details.GenderID, &tutors[j].Details.PobID, &tutors[j].Details.Dob, &tutors[j].Details.Phone, &tutors[j].Details.Email, &tutors[j].Details.StreetAddress, &tutors[j].Details.AddressID, &tutors[j].Details.InsSource, &tutors[j].Details.JoinDate, &tutors[j].Details.ID)
-			if err != nil {
-				tx.Rollback()
-				common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-				return
-			}
-
-			_, err2 := tx.Exec(updateTut, &tutors[j].NomorInduk, &tutors[j].Name, &tutors[j].TutorTypeID, &tutors[j].Status, &tutors[j].ID)
-			if err2 != nil {
-				tx.Rollback()
-				common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-				return
-			}
-
-			_, err3 := tx.Exec(updateUsr, &tutors[j].Details.Email, &tutors[j].UserID)
-			if err3 != nil {
-				tx.Rollback()
-				common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-				return
-			}
-
-		} else {
-			//insert
-			_, err := tx.Exec(insertDet, &tutors[j].Details.EducationFront, &tutors[j].Details.EducationBack, &tutors[j].Details.Ktp, &tutors[j].Details.Sim, &tutors[j].Details.Npwp, &tutors[j].Details.GenderID, &tutors[j].Details.PobID, &tutors[j].Details.Dob, &tutors[j].Details.Phone, &tutors[j].Details.Email, &tutors[j].Details.StreetAddress, &tutors[j].Details.AddressID, &tutors[j].Details.InsSource, &tutors[j].Details.JoinDate, &tutors[j].ID, &tutors[j].UserID)
-			if err != nil {
-				tx.Rollback()
-				common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-				return
-			}
+		errStr = tutorService.CreateTutors(*tutor)
+		if errStr.Code != http.StatusOK {
+			common.JSONErr(w, errStr)
+			return
 		}
 		j++
 	}
 
-	errstr.Message = structs.Success
-	errstr.Code = http.StatusOK
-	tx.Commit()
-	json.NewEncoder(w).Encode(errstr)
+	errStr := structs.ErrorMessage{Message: structs.Success, SysMessage: "", Code: http.StatusOK}
+	common.JSONErr(w, &errStr)
+	return
 
 }
 
 //CreateTutors is the func that will insert multiple tutors at once (complete).
 //please note that the email in request parameter is the username coming from Login func
+/*
 func CreateTutors(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -654,3 +629,4 @@ func CreateTutors(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(errstr)
 
 }
+*/

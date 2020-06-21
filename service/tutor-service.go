@@ -1,15 +1,23 @@
 package service
 
 import (
+	"net/http"
+
 	"github.com/ealfarozi/zulucore/interfaces"
 	"github.com/ealfarozi/zulucore/structs"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 type TutorService interface {
-	Validate(*structs.Tutor) (*structs.Tutor, *structs.ErrorMessage)
-	Validates(*[]structs.Tutor) (*[]structs.Tutor, *structs.ErrorMessage)
+	Validate(tutor *structs.Tutor) (*structs.Tutor, *structs.ErrorMessage)
+	Validates(tutors *[]structs.Tutor) (*structs.Tutor, *structs.ErrorMessage)
+	UpdateTutorDetails(tutors structs.Tutor) *structs.ErrorMessage
+	CreateTutors(tutor structs.Tutor) *structs.ErrorMessage
 	GetTutors(insID string) (*[]structs.Tutor, *structs.ErrorMessage)
 	GetTutorDetails(tutorID string) (*structs.Tutor, *structs.ErrorMessage)
+	GetTutor(nmrInd string, name string, insID string) (*[]structs.Tutor, *structs.ErrorMessage)
+	CheckNomorInduk(insID int, nmrInduk string, tutorID int) int
+	CheckEmail(email string, usrID int) int
 }
 
 type service struct{}
@@ -23,6 +31,10 @@ func NewTutorService(repository interfaces.TutorRepository) TutorService {
 	return &service{}
 }
 
+func (*service) GetTutor(nmrInd string, name string, insID string) (*[]structs.Tutor, *structs.ErrorMessage) {
+	return repo.GetTutor(nmrInd, name, insID)
+}
+
 func (*service) GetTutors(insID string) (*[]structs.Tutor, *structs.ErrorMessage) {
 	return repo.GetTutors(insID)
 }
@@ -31,10 +43,35 @@ func (*service) GetTutorDetails(tutorID string) (*structs.Tutor, *structs.ErrorM
 	return repo.GetTutorDetails(tutorID)
 }
 
-func (*service) Validate(*structs.Tutor) (*structs.Tutor, *structs.ErrorMessage) {
-	return nil, nil
+func (*service) UpdateTutorDetails(tutor structs.Tutor) *structs.ErrorMessage {
+	return repo.UpdateTutorDetails(tutor)
 }
 
-func (*service) Validates(*[]structs.Tutor) (*[]structs.Tutor, *structs.ErrorMessage) {
+func (*service) CreateTutors(tutor structs.Tutor) *structs.ErrorMessage {
+	return repo.CreateTutors(tutor)
+}
+
+func (*service) CheckNomorInduk(insID int, nmrInduk string, tutorID int) int {
+	return repo.CheckNomorInduk(insID, nmrInduk, tutorID)
+}
+
+func (*service) CheckEmail(email string, usrID int) int {
+	return repo.CheckEmail(email, usrID)
+}
+
+func (*service) Validate(tutor *structs.Tutor) (*structs.Tutor, *structs.ErrorMessage) {
+	var errors structs.ErrorMessage
+	v := validator.New()
+	err := v.Struct(tutor)
+	if err != nil {
+		errors.Message = structs.Validate
+		errors.SysMessage = err.Error()
+		errors.Code = http.StatusInternalServerError
+		return nil, &errors
+	}
+	return tutor, nil
+}
+
+func (*service) Validates(tutors *[]structs.Tutor) (*structs.Tutor, *structs.ErrorMessage) {
 	return nil, nil
 }

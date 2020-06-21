@@ -24,4 +24,5 @@ var (
 	Validate      = "error when validating the data"
 	NomorInd      = "nomor induk is exist for that institutions"
 	Email         = "email is already exists"
+	EmptyID       = "ID can't be empty"
 )
