@@ -370,6 +370,7 @@ func UpdateResearches(w http.ResponseWriter, r *http.Request) {
 func (*logic) UpdateTutorDetails(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var tutors []structs.Tutor
+	var errs []structs.ErrorMessage
 
 	_ = json.NewDecoder(r.Body).Decode(&tutors)
 
@@ -377,40 +378,36 @@ func (*logic) UpdateTutorDetails(w http.ResponseWriter, r *http.Request) {
 	for range tutors {
 		tutor, errStr := tutorService.Validate(&tutors[j])
 		if errStr != nil {
-			common.JSONErr(w, errStr)
-			return
+			errs = append(errs, *errStr)
 		}
 
 		if tutor.ID == 0 {
-			errStr := structs.ErrorMessage{Message: structs.EmptyID, SysMessage: "", Code: http.StatusInternalServerError}
-			common.JSONErr(w, &errStr)
-			return
+			errStr := structs.ErrorMessage{Data: tutors[j].NomorInduk, Message: structs.EmptyID, SysMessage: "", Code: http.StatusInternalServerError}
+			errs = append(errs, errStr)
 		}
 
 		checkNomorInduk := tutorService.CheckNomorInduk(tutors[j].InsID, tutors[j].NomorInduk, tutors[j].ID)
 		if checkNomorInduk != 0 {
-			errStr := structs.ErrorMessage{Message: structs.NomorInd, SysMessage: "", Code: http.StatusInternalServerError}
-			common.JSONErr(w, &errStr)
-			return
+			errStr := structs.ErrorMessage{Data: tutors[j].NomorInduk, Message: structs.NomorInd, SysMessage: "", Code: http.StatusInternalServerError}
+			errs = append(errs, errStr)
 		}
 
 		checkEmail := tutorService.CheckEmail(tutors[j].Details.Email, tutors[j].UserID)
 		if checkEmail != 0 {
-			errStr := structs.ErrorMessage{Message: structs.Email, SysMessage: "", Code: http.StatusInternalServerError}
-			common.JSONErr(w, &errStr)
-			return
+			errStr := structs.ErrorMessage{Data: tutors[j].NomorInduk, Message: structs.Email, SysMessage: "", Code: http.StatusInternalServerError}
+			errs = append(errs, errStr)
 		}
 
 		//insert or update
 		errStr = tutorService.UpdateTutorDetails(*tutor)
 		if errStr.Code != http.StatusOK {
-			common.JSONErr(w, errStr)
-			return
+			errs = append(errs, *errStr)
 		}
+		errs = append(errs, structs.ErrorMessage{Data: tutors[j].NomorInduk, Message: structs.Success, SysMessage: "", Code: http.StatusOK})
 		j++
 	}
-	errStr := structs.ErrorMessage{Message: structs.Success, SysMessage: "", Code: http.StatusOK}
-	common.JSONErr(w, &errStr)
+
+	common.JSONErrs(w, &errs)
 	return
 }
 
@@ -419,6 +416,7 @@ func (*logic) UpdateTutorDetails(w http.ResponseWriter, r *http.Request) {
 func (*logic) CreateTutors(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var tutors []structs.Tutor
+	var errs []structs.ErrorMessage
 
 	_ = json.NewDecoder(r.Body).Decode(&tutors)
 
@@ -426,207 +424,33 @@ func (*logic) CreateTutors(w http.ResponseWriter, r *http.Request) {
 	for range tutors {
 		tutor, errStr := tutorService.Validate(&tutors[j])
 		if errStr != nil {
-			common.JSONErr(w, errStr)
-			return
+			errs = append(errs, *errStr)
 		}
 
 		checkNomorInduk := common.CheckNomorInduk(tutors[j].InsID, tutors[j].NomorInduk, 0)
 		if checkNomorInduk != 0 {
-			errStr := structs.ErrorMessage{Message: structs.NomorInd, SysMessage: "", Code: http.StatusInternalServerError}
-			common.JSONErr(w, &errStr)
-			return
+			errStr := structs.ErrorMessage{Data: tutors[j].NomorInduk, Message: structs.NomorInd, SysMessage: "", Code: http.StatusInternalServerError}
+			errs = append(errs, errStr)
 		}
 
-		checkEmail := tutorService.CheckEmail(tutors[j].Details.Email, tutors[j].UserID)
-		if checkEmail != 0 {
-			errStr := structs.ErrorMessage{Message: structs.Email, SysMessage: "", Code: http.StatusInternalServerError}
-			common.JSONErr(w, &errStr)
-			return
+		if tutors[j].Details != nil {
+			checkEmail := tutorService.CheckEmail(tutors[j].Details.Email, tutors[j].UserID)
+			if checkEmail != 0 {
+				errStr := structs.ErrorMessage{Data: tutors[j].NomorInduk, Message: structs.Email, SysMessage: "", Code: http.StatusInternalServerError}
+				errs = append(errs, errStr)
+			}
 		}
 
 		errStr = tutorService.CreateTutors(*tutor)
 		if errStr.Code != http.StatusOK {
-			common.JSONErr(w, errStr)
-			return
+			errs = append(errs, *errStr)
 		}
-		j++
-	}
 
-	errStr := structs.ErrorMessage{Message: structs.Success, SysMessage: "", Code: http.StatusOK}
-	common.JSONErr(w, &errStr)
+		errs = append(errs, structs.ErrorMessage{Data: tutors[j].NomorInduk, Message: structs.Success, SysMessage: "", Code: http.StatusOK})
+		j++
+
+	}
+	common.JSONErrs(w, &errs)
 	return
 
 }
-
-//CreateTutors is the func that will insert multiple tutors at once (complete).
-//please note that the email in request parameter is the username coming from Login func
-/*
-func CreateTutors(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	var tutors []structs.Tutor
-	var errstr structs.ErrorMessage
-
-	_ = json.NewDecoder(r.Body).Decode(&tutors)
-
-	db := mysql.InitializeMySQL()
-	tx, err := db.Begin()
-
-	//start checking insert
-	if err != nil {
-		tx.Rollback()
-		common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	j := 0
-	for range tutors {
-		check := common.CheckNomorInduk(tutors[j].InsID, tutors[j].NomorInduk, 0)
-
-		if check != 0 {
-			tx.Rollback()
-			fmt.Printf(tutors[j].NomorInduk)
-			common.JSONError(w, structs.NomorInd, "", http.StatusInternalServerError)
-			return
-		}
-
-		sqlQuery := "insert into tutors (nomor_induk, name, tutor_type_id, user_id) values (?, ?, ?, ?)"
-		res, err := tx.Exec(sqlQuery, &tutors[j].NomorInduk, &tutors[j].Name, &tutors[j].TutorTypeID, &tutors[j].UserID)
-		if err != nil {
-			tx.Rollback()
-			common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		lastID, err := res.LastInsertId()
-		lastTutorID := int(lastID)
-		if err != nil {
-			tx.Rollback()
-			common.JSONError(w, structs.LastIDErr, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		//insert details
-		if tutors[j].Details != nil {
-			tutors[j].Details.TutorID = lastTutorID
-			tutors[j].Details.UserID = tutors[j].UserID
-
-			sqlQueryDetail := "insert into tutor_details (education_degree_front, education_degree_back, ktp, sim, npwp, gender_id, pob_id, dob, phone, email, street_address, address_id, institution_source_name, join_date, tutor_id, user_id ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-			res, err := tx.Exec(sqlQueryDetail, &tutors[j].Details.EducationFront, &tutors[j].Details.EducationBack, &tutors[j].Details.Ktp, &tutors[j].Details.Sim, &tutors[j].Details.Npwp, &tutors[j].Details.GenderID, &tutors[j].Details.PobID, &tutors[j].Details.Dob, &tutors[j].Details.Phone, &tutors[j].Details.Email, &tutors[j].Details.StreetAddress, &tutors[j].Details.AddressID, &tutors[j].Details.InsSource, &tutors[j].Details.JoinDate, &lastTutorID, &tutors[j].UserID)
-			if err != nil {
-				tx.Rollback()
-				common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-				return
-			}
-
-			lastID, err := res.LastInsertId()
-			if err != nil {
-				tx.Rollback()
-				common.JSONError(w, structs.LastIDErr, err.Error(), http.StatusInternalServerError)
-				log.Println(lastID)
-				return
-			}
-		}
-
-		//insert educations
-		k := 0
-		if len(tutors[j].Education) != 0 {
-			sqlQueryEdu := "insert into tutor_educations (univ_degree_id, univ_name, years, tutor_id) values (?, ?, ?, ?)"
-			for range tutors[j].Education {
-				tutors[j].Education[k].TutorID = lastTutorID
-
-				_, err2 := tx.Exec(sqlQueryEdu, &tutors[j].Education[k].UnivDegreeID, &tutors[j].Education[k].UnivName, &tutors[j].Education[k].Years, &lastTutorID)
-				if err2 != nil {
-					tx.Rollback()
-					common.JSONError(w, structs.QueryErr, err2.Error(), http.StatusInternalServerError)
-					return
-				}
-				k++
-			}
-		}
-
-		//insert certificates
-		m := 0
-		if len(tutors[j].Certificate) != 0 {
-			sqlQueryCert := "insert into tutor_certificates (cert_name, cert_date, tutor_id) values (?, ?, ?)"
-			for range tutors[j].Certificate {
-				tutors[j].Certificate[m].TutorID = lastTutorID
-
-				_, err2 := tx.Exec(sqlQueryCert, &tutors[j].Certificate[m].CertName, &tutors[j].Certificate[m].CertDate, &lastTutorID)
-				if err2 != nil {
-					tx.Rollback()
-					common.JSONError(w, structs.QueryErr, err2.Error(), http.StatusInternalServerError)
-					return
-				}
-				m++
-			}
-		}
-
-		//insert Experiences
-		n := 0
-		if len(tutors[j].Experience) != 0 {
-			sqlQueryExp := "insert into tutor_experiences (exp_name, description, years, tutor_id) values (?, ?, ?, ?)"
-			for range tutors[j].Experience {
-				tutors[j].Experience[n].TutorID = lastTutorID
-
-				_, err2 := tx.Exec(sqlQueryExp, &tutors[j].Experience[n].ExpName, &tutors[j].Experience[n].Description, &tutors[j].Experience[n].Years, &lastTutorID)
-				if err2 != nil {
-					tx.Rollback()
-					common.JSONError(w, structs.QueryErr, err2.Error(), http.StatusInternalServerError)
-					return
-				}
-				n++
-			}
-		}
-
-		//insert Journal
-		p := 0
-		if len(tutors[j].Journal) != 0 {
-			sqlQueryJour := "insert into tutor_journals (journal_name, publish_at, publish_date, tutor_id) values (?, ?, ?, ?)"
-			for range tutors[j].Journal {
-				tutors[j].Journal[p].TutorID = lastTutorID
-
-				_, err2 := tx.Exec(sqlQueryJour, &tutors[j].Journal[p].JourName, &tutors[j].Journal[p].PublishAt, &tutors[j].Journal[p].PublishDate, &lastTutorID)
-				if err2 != nil {
-					tx.Rollback()
-					common.JSONError(w, structs.QueryErr, err2.Error(), http.StatusInternalServerError)
-					return
-				}
-				p++
-			}
-		}
-
-		//insert research
-		a := 0
-		if len(tutors[j].Research) != 0 {
-			sqlQueryRes := "insert into tutor_researches (res_name, description, years, tutor_id) values (?, ?, ?, ?)"
-			for range tutors[j].Research {
-				tutors[j].Research[a].TutorID = lastTutorID
-
-				_, err2 := tx.Exec(sqlQueryRes, &tutors[j].Research[a].ResName, &tutors[j].Research[a].Description, &tutors[j].Research[a].Years, &lastTutorID)
-				if err2 != nil {
-					tx.Rollback()
-					common.JSONError(w, structs.QueryErr, err2.Error(), http.StatusInternalServerError)
-					return
-				}
-				a++
-			}
-		}
-
-		v := validator.New()
-		err = v.Struct(tutors[j])
-		if err != nil {
-			tx.Rollback()
-			common.JSONError(w, structs.Validate, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		errstr.Message = structs.Success
-		errstr.Code = http.StatusOK
-		j++
-	}
-	tx.Commit()
-	json.NewEncoder(w).Encode(errstr)
-
-}
-*/

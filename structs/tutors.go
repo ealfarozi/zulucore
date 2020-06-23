@@ -50,7 +50,7 @@ type TutorEducation struct {
 	UnivName     string `json:"univ_name" validate:"required"`
 	Years        int    `json:"years" validate:"required"`
 	TutorID      int    `json:"tutor_id,omitempty"`
-	Status       int    `json:"status,omitempty"`
+	Status       int    `json:"status" validate:"required"`
 }
 
 //TutorCertificate is the struct to get the certificate details of a tutor

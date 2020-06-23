@@ -10,6 +10,7 @@ type TutorRepository interface {
 	GetTutor(nmrInd string, name string, insID string) (*[]structs.Tutor, *structs.ErrorMessage)
 	UpdateTutorDetails(tutor structs.Tutor) *structs.ErrorMessage
 	CreateTutors(tutor structs.Tutor) *structs.ErrorMessage
+	UpdateEducations(edu structs.TutorEducation) *structs.ErrorMessage
 	CheckNomorInduk(insID int, nmrInduk string, tutorID int) int
 	CheckEmail(email string, usrID int) int
 }

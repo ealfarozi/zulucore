@@ -65,6 +65,7 @@ func (*service) Validate(tutor *structs.Tutor) (*structs.Tutor, *structs.ErrorMe
 	err := v.Struct(tutor)
 	if err != nil {
 		errors.Message = structs.Validate
+		errors.Data = tutor.NomorInduk
 		errors.SysMessage = err.Error()
 		errors.Code = http.StatusInternalServerError
 		return nil, &errors

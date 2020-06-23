@@ -3,6 +3,7 @@ package structs
 //ErrorMessage struct for general error
 type ErrorMessage struct {
 	Message    string `json:"message,omitempty"`
+	Data       string `json:"data,omitempty"`
 	SysMessage string `json:"system_message,omitempty"`
 	Code       int    `json:"code,omitempty"`
 }

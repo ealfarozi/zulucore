@@ -204,6 +204,7 @@ func (*repo) UpdateTutorDetails(tutor structs.Tutor) *structs.ErrorMessage {
 	if err != nil {
 		tx.Rollback()
 		errors.Message = structs.QueryErr
+		errors.Data = tutor.NomorInduk
 		errors.SysMessage = err.Error()
 		errors.Code = http.StatusInternalServerError
 		return &errors
@@ -221,6 +222,7 @@ func (*repo) UpdateTutorDetails(tutor structs.Tutor) *structs.ErrorMessage {
 		if err != nil {
 			tx.Rollback()
 			errors.Message = structs.QueryErr
+			errors.Data = tutor.NomorInduk
 			errors.SysMessage = err.Error()
 			errors.Code = http.StatusInternalServerError
 			return &errors
@@ -230,6 +232,7 @@ func (*repo) UpdateTutorDetails(tutor structs.Tutor) *structs.ErrorMessage {
 		if err2 != nil {
 			tx.Rollback()
 			errors.Message = structs.QueryErr
+			errors.Data = tutor.NomorInduk
 			errors.SysMessage = err2.Error()
 			errors.Code = http.StatusInternalServerError
 			return &errors
@@ -239,6 +242,7 @@ func (*repo) UpdateTutorDetails(tutor structs.Tutor) *structs.ErrorMessage {
 		if err3 != nil {
 			tx.Rollback()
 			errors.Message = structs.QueryErr
+			errors.Data = tutor.NomorInduk
 			errors.SysMessage = err3.Error()
 			errors.Code = http.StatusInternalServerError
 			return &errors
@@ -250,6 +254,7 @@ func (*repo) UpdateTutorDetails(tutor structs.Tutor) *structs.ErrorMessage {
 		if err != nil {
 			tx.Rollback()
 			errors.Message = structs.QueryErr
+			errors.Data = tutor.NomorInduk
 			errors.SysMessage = err.Error()
 			errors.Code = http.StatusInternalServerError
 			return &errors
@@ -257,6 +262,7 @@ func (*repo) UpdateTutorDetails(tutor structs.Tutor) *structs.ErrorMessage {
 	}
 
 	errors.Message = structs.Success
+	errors.Data = tutor.NomorInduk
 	errors.Code = http.StatusOK
 	tx.Commit()
 	return &errors
@@ -274,6 +280,7 @@ func (*repo) CreateTutors(tutor structs.Tutor) *structs.ErrorMessage {
 	if err != nil {
 		tx.Rollback()
 		errors.Message = structs.QueryErr
+		errors.Data = tutor.NomorInduk
 		errors.SysMessage = err.Error()
 		errors.Code = http.StatusInternalServerError
 		return &errors
@@ -284,6 +291,7 @@ func (*repo) CreateTutors(tutor structs.Tutor) *structs.ErrorMessage {
 	if err != nil {
 		tx.Rollback()
 		errors.Message = structs.QueryErr
+		errors.Data = tutor.NomorInduk
 		errors.SysMessage = err.Error()
 		errors.Code = http.StatusInternalServerError
 		return &errors
@@ -294,6 +302,7 @@ func (*repo) CreateTutors(tutor structs.Tutor) *structs.ErrorMessage {
 	if err != nil {
 		tx.Rollback()
 		errors.Message = structs.LastIDErr
+		errors.Data = tutor.NomorInduk
 		errors.SysMessage = err.Error()
 		errors.Code = http.StatusInternalServerError
 		return &errors
@@ -309,6 +318,7 @@ func (*repo) CreateTutors(tutor structs.Tutor) *structs.ErrorMessage {
 		if err != nil {
 			tx.Rollback()
 			errors.Message = structs.QueryErr
+			errors.Data = tutor.NomorInduk
 			errors.SysMessage = err.Error()
 			errors.Code = http.StatusInternalServerError
 			return &errors
@@ -318,6 +328,7 @@ func (*repo) CreateTutors(tutor structs.Tutor) *structs.ErrorMessage {
 		if err != nil {
 			tx.Rollback()
 			errors.Message = structs.LastIDErr
+			errors.Data = tutor.NomorInduk
 			errors.SysMessage = err.Error()
 			errors.Code = http.StatusInternalServerError
 			log.Println(lastID)
@@ -336,6 +347,7 @@ func (*repo) CreateTutors(tutor structs.Tutor) *structs.ErrorMessage {
 			if err2 != nil {
 				tx.Rollback()
 				errors.Message = structs.QueryErr
+				errors.Data = tutor.NomorInduk
 				errors.SysMessage = err2.Error()
 				errors.Code = http.StatusInternalServerError
 				return &errors
@@ -355,6 +367,7 @@ func (*repo) CreateTutors(tutor structs.Tutor) *structs.ErrorMessage {
 			if err2 != nil {
 				tx.Rollback()
 				errors.Message = structs.QueryErr
+				errors.Data = tutor.NomorInduk
 				errors.SysMessage = err.Error()
 				errors.Code = http.StatusInternalServerError
 				return &errors
@@ -423,6 +436,54 @@ func (*repo) CreateTutors(tutor structs.Tutor) *structs.ErrorMessage {
 	errors.Message = structs.Success
 	errors.Code = http.StatusOK
 
+	tx.Commit()
+	return &errors
+
+}
+
+//UpdateEducations is the func to create/update the education in tutor entity. please note that status = 0 (soft delete)
+func (*repo) UpdateEducations(edu structs.TutorEducation) *structs.ErrorMessage {
+
+	var errors structs.ErrorMessage
+	var queryStr string
+	var refID int
+
+	db := mysql.InitializeMySQL()
+	tx, err := db.Begin()
+
+	if err != nil {
+		tx.Rollback()
+		errors.Message = structs.QueryErr
+		errors.Data = edu.UnivName
+		errors.SysMessage = err.Error()
+		errors.Code = http.StatusInternalServerError
+		return &errors
+	}
+
+	insertEdu := "insert into tutor_educations (univ_degree_id, univ_name, years, status, tutor_id) values (?, ?, ?, ?, ?)"
+	updateEdu := "update tutor_educations set univ_degree_id = ?, univ_name = ?, years = ?, status = ?, updated_at = now(), updated_by = 'API' where id = ?"
+
+	if edu.ID != 0 {
+		queryStr = updateEdu
+		refID = edu.ID
+	} else {
+		queryStr = insertEdu
+		refID = edu.TutorID
+	}
+
+	_, err2 := tx.Exec(queryStr, &edu.UnivDegreeID, &edu.UnivName, &edu.Years, &edu.Status, &refID)
+	if err2 != nil {
+		tx.Rollback()
+		errors.Message = structs.QueryErr
+		errors.Data = edu.UnivName
+		errors.SysMessage = err2.Error()
+		errors.Code = http.StatusInternalServerError
+		return &errors
+	}
+
+	errors.Message = structs.Success
+	errors.Data = edu.UnivName
+	errors.Code = http.StatusOK
 	tx.Commit()
 	return &errors
 

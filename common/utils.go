@@ -25,6 +25,12 @@ func JSONErr(w http.ResponseWriter, errStr *structs.ErrorMessage) {
 	json.NewEncoder(w).Encode(errStr)
 }
 
+func JSONErrs(w http.ResponseWriter, errStr *[]structs.ErrorMessage) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(errStr)
+}
+
 //GetAddressOnly is func to get all address via SQL not from http request
 func GetAddressOnly(addID int) structs.Address {
 	var addr structs.Address
