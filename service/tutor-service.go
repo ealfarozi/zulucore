@@ -10,9 +10,11 @@ import (
 
 type TutorService interface {
 	Validate(tutor *structs.Tutor) (*structs.Tutor, *structs.ErrorMessage)
+	ValidateEdu(edu *structs.TutorEducation) *structs.ErrorMessage
 	Validates(tutors *[]structs.Tutor) (*structs.Tutor, *structs.ErrorMessage)
 	UpdateTutorDetails(tutors structs.Tutor) *structs.ErrorMessage
 	CreateTutors(tutor structs.Tutor) *structs.ErrorMessage
+	UpdateEducations(edu structs.TutorEducation) *structs.ErrorMessage
 	GetTutors(insID string) (*[]structs.Tutor, *structs.ErrorMessage)
 	GetTutorDetails(tutorID string) (*structs.Tutor, *structs.ErrorMessage)
 	GetTutor(nmrInd string, name string, insID string) (*[]structs.Tutor, *structs.ErrorMessage)
@@ -47,6 +49,10 @@ func (*service) UpdateTutorDetails(tutor structs.Tutor) *structs.ErrorMessage {
 	return repo.UpdateTutorDetails(tutor)
 }
 
+func (*service) UpdateEducations(edu structs.TutorEducation) *structs.ErrorMessage {
+	return repo.UpdateEducations(edu)
+}
+
 func (*service) CreateTutors(tutor structs.Tutor) *structs.ErrorMessage {
 	return repo.CreateTutors(tutor)
 }
@@ -71,6 +77,20 @@ func (*service) Validate(tutor *structs.Tutor) (*structs.Tutor, *structs.ErrorMe
 		return nil, &errors
 	}
 	return tutor, nil
+}
+
+func (*service) ValidateEdu(edu *structs.TutorEducation) *structs.ErrorMessage {
+	var errors structs.ErrorMessage
+	v := validator.New()
+	err := v.Struct(edu)
+	if err != nil {
+		errors.Message = structs.Validate
+		errors.Data = edu.UnivName
+		errors.SysMessage = err.Error()
+		errors.Code = http.StatusInternalServerError
+		return &errors
+	}
+	return nil
 }
 
 func (*service) Validates(tutors *[]structs.Tutor) (*structs.Tutor, *structs.ErrorMessage) {

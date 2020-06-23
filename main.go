@@ -32,7 +32,7 @@ func main() {
 	httpRouter.GET("/api/v1/tutor", tutorLogic.GetTutor)
 	httpRouter.POST("/api/v1/tutor/details", tutorLogic.UpdateTutorDetails)
 	httpRouter.GET("/api/v1/tutor/details", tutorLogic.GetTutorDetails)
-	httpRouter.POST("/api/v1/tutor/educations", api.UpdateEducations)
+	httpRouter.POST("/api/v1/tutor/educations", tutorLogic.UpdateEducations)
 	httpRouter.POST("/api/v1/tutor/experiences", api.UpdateExperiences)
 	httpRouter.POST("/api/v1/tutor/certificates", api.UpdateCertificates)
 	httpRouter.POST("/api/v1/tutor/journals", api.UpdateJournals)
