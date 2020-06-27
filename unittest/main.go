@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -10,13 +11,15 @@ import (
 )
 
 func main() {
-	var usr = structs.User{}
-	fmt.Println(usr)
 	url := "http://localhost:8000/api/v1/login"
 	fmt.Println("URL:>", url)
 
-	var jsonStr = []byte(`{"username": "admin@superadmin.com", "password": "12345678"}`)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	var usr = structs.User{Username: "admin@superadmin.com", Password: "12345678"}
+	fmt.Println("struct value: ", usr)
+
+	requestByte, _ := json.Marshal(usr)
+
+	req, err := http.NewRequest("POST", url, bytes.NewReader(requestByte))
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
