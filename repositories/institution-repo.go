@@ -11,6 +11,7 @@ import (
 
 type insRepo struct{}
 
+//NewInstitutionRepository is the constructor for Institution repository
 func NewInstitutionRepository() interfaces.InstitutionRepository {
 	return &insRepo{}
 }

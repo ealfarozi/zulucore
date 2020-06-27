@@ -12,6 +12,7 @@ import (
 
 type repo struct{}
 
+//NewTutorRepository is the constructor for tutor-repo
 func NewTutorRepository() interfaces.TutorRepository {
 	return &repo{}
 }

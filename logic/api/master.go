@@ -3,65 +3,12 @@ package api
 import (
 	"database/sql"
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/ealfarozi/zulucore/common"
 	"github.com/ealfarozi/zulucore/repositories/mysql"
 	"github.com/ealfarozi/zulucore/structs"
-	"gopkg.in/go-playground/validator.v9"
 )
-
-//CreateInstitutions is the func for creating the institutions
-func CreateInstitutions(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	var insts []structs.Institution
-	var errstr structs.ErrorMessage
-	_ = json.NewDecoder(r.Body).Decode(&insts)
-	db := mysql.InitializeMySQL()
-	sqlQuery := "insert into institutions (code, name, street_address, street_map_id, bill_address, bill_map_id, pic_name, pic_phone, expired_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-
-	tx, err := db.Begin()
-	j := 0
-	for range insts {
-		if err != nil {
-			tx.Rollback()
-			common.JSONError(w, insts[j].Name, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		v := validator.New()
-		err := v.Struct(insts[j])
-		if err != nil {
-			tx.Rollback()
-			common.JSONError(w, structs.Validate, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		res, err := tx.Exec(sqlQuery, &insts[j].Code, &insts[j].Name, &insts[j].Street, &insts[j].MapID, &insts[j].BillStreet, &insts[j].BillMapID, &insts[j].PICName, &insts[j].PICPhone, &insts[j].ExpireAt)
-
-		if err != nil {
-			tx.Rollback()
-			common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		lastInsertedID, err := res.LastInsertId()
-		if err != nil {
-			tx.Rollback()
-			common.JSONError(w, structs.LastIDErr, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		log.Println("success insert into institution with ID:", lastInsertedID)
-		errstr.Message = structs.Success
-		errstr.Code = http.StatusOK
-		j++
-	}
-
-	tx.Commit()
-	json.NewEncoder(w).Encode(errstr)
-}
 
 //GetReferences is func to get any refs in references table
 func GetReferences(w http.ResponseWriter, r *http.Request) {

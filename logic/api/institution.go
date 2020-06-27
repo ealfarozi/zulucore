@@ -21,12 +21,14 @@ var (
 	insRepo    interfaces.InstitutionRepository = repositories.NewInstitutionRepository()
 )
 
+//InstitutionLogic is the interface for institutions
 type InstitutionLogic interface {
 	GetInstitutions(w http.ResponseWriter, r *http.Request)
 	GetInstitution(w http.ResponseWriter, r *http.Request)
 	CreateInstitutions(w http.ResponseWriter, r *http.Request)
 }
 
+//NewInstitutionLogic is the func to calling the construtor of institution interface
 func NewInstitutionLogic(service service.InstitutionService) InstitutionLogic {
 	insService = service
 	return &insLogic{}

@@ -21,6 +21,7 @@ var (
 	repo         interfaces.TutorRepository = repositories.NewTutorRepository()
 )
 
+//TutorLogic is the interface of httpRequest for Tutor
 type TutorLogic interface {
 	GetTutors(w http.ResponseWriter, r *http.Request)
 	GetTutorDetails(w http.ResponseWriter, r *http.Request)
@@ -34,6 +35,7 @@ type TutorLogic interface {
 	CreateTutors(w http.ResponseWriter, r *http.Request)
 }
 
+//NewTutorLogic is the func to calling the constructor of tutor interface
 func NewTutorLogic(service service.TutorService) TutorLogic {
 	tutorService = service
 	return &logic{}
