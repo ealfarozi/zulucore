@@ -61,7 +61,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		}
 
 		//get user institutions
-		sqlQueryIns := "select ins.id, ins.code, ins.name from user_roles ur inner join institutions ins on ur.institution_id = ins.id and ur.user_id = ?"
+		sqlQueryIns := "select ins.id, ins.code, ins.name, ins.street_address, ins.street_map_id from user_roles ur inner join institutions ins on ur.institution_id = ins.id and ur.user_id = ?"
 		res2, err := db.Query(sqlQueryIns, ath.Data.UserID)
 		defer mysql.CloseRows(res2)
 		if err != nil {
@@ -69,7 +69,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for res2.Next() {
-			res2.Scan(&ins.ID, &ins.Code, &ins.Name)
+			res2.Scan(&ins.ID, &ins.Code, &ins.Name, &ins.Street, &ins.MapID)
+			ins.FullAddress = common.GetAddressOnly(ins.MapID)
 			ath.Institutions = append(ath.Institutions, ins)
 		}
 

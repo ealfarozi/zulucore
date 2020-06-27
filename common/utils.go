@@ -71,6 +71,7 @@ func CheckNomorInduk(insID int, nmrInduk string, tutorID int) int {
 	return check
 }
 
+//CheckNomorInduk is the func to check registered/updated nomor induk
 func CheckNomorIndukStd(insID int, nmrInduk string, stdID int) int {
 	db := mysql.InitializeMySQL()
 	sqlQueryCheck := "SELECT count(1) FROM students std inner join (select user_id from user_roles where institution_id = ?) ur on std.user_id = ur.user_id where std.nomor_induk = ? "

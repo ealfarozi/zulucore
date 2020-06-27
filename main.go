@@ -10,9 +10,13 @@ import (
 
 var (
 	httpRouter      router.Router              = router.NewMuxRouter()
-	tutorRepository interfaces.TutorRepository = repositories.NewMysqlRepository()
+	tutorRepository interfaces.TutorRepository = repositories.NewTutorRepository()
 	tutorService    service.TutorService       = service.NewTutorService(tutorRepository)
 	tutorLogic      api.TutorLogic             = api.NewTutorLogic(tutorService)
+
+	insRepository interfaces.InstitutionRepository = repositories.NewInstitutionRepository()
+	insService    service.InstitutionService       = service.NewInstitutionService(insRepository)
+	insLogic      api.InstitutionLogic             = api.NewInstitutionLogic(insService)
 )
 
 func main() {
@@ -23,9 +27,9 @@ func main() {
 	httpRouter.GET("/api/v1/address", api.GetAddress)
 	httpRouter.POST("/api/v1/userlogin", api.CreateUserLogin)
 
-	httpRouter.GET("/api/v1/institution", api.GetInstitution)
-	httpRouter.GET("/api/v1/institutions", api.GetInstitutions)
-	httpRouter.POST("/api/v1/institutions", api.CreateInstitutions)
+	httpRouter.GET("/api/v1/institution", insLogic.GetInstitution)
+	httpRouter.GET("/api/v1/institutions", insLogic.GetInstitutions)
+	httpRouter.POST("/api/v1/institutions", insLogic.CreateInstitutions)
 
 	httpRouter.POST("/api/v1/tutors", tutorLogic.CreateTutors)
 	httpRouter.GET("/api/v1/tutors", tutorLogic.GetTutors)
@@ -33,10 +37,10 @@ func main() {
 	httpRouter.POST("/api/v1/tutor/details", tutorLogic.UpdateTutorDetails)
 	httpRouter.GET("/api/v1/tutor/details", tutorLogic.GetTutorDetails)
 	httpRouter.POST("/api/v1/tutor/educations", tutorLogic.UpdateEducations)
-	httpRouter.POST("/api/v1/tutor/experiences", api.UpdateExperiences)
-	httpRouter.POST("/api/v1/tutor/certificates", api.UpdateCertificates)
-	httpRouter.POST("/api/v1/tutor/journals", api.UpdateJournals)
-	httpRouter.POST("/api/v1/tutor/researches", api.UpdateResearches)
+	httpRouter.POST("/api/v1/tutor/experiences", tutorLogic.UpdateExperiences)
+	httpRouter.POST("/api/v1/tutor/certificates", tutorLogic.UpdateCertificates)
+	httpRouter.POST("/api/v1/tutor/journals", tutorLogic.UpdateJournals)
+	httpRouter.POST("/api/v1/tutor/researches", tutorLogic.UpdateResearches)
 
 	httpRouter.POST("/api/v1/students", api.CreateStudents)
 	httpRouter.GET("/api/v1/students", api.GetStudents)

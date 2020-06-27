@@ -12,7 +12,7 @@ import (
 
 type repo struct{}
 
-func NewMysqlRepository() interfaces.TutorRepository {
+func NewTutorRepository() interfaces.TutorRepository {
 	return &repo{}
 }
 
@@ -441,9 +441,146 @@ func (*repo) CreateTutors(tutor structs.Tutor) *structs.ErrorMessage {
 
 }
 
+//UpdateCertificates is the func to create/update the certificates in tutor entity. please note that status = 0 (soft delete)
+func (*repo) UpdateCertificates(cert structs.TutorCertificate) *structs.ErrorMessage {
+	var errors structs.ErrorMessage
+	var queryStr string
+	var refID int
+
+	db := mysql.InitializeMySQL()
+	tx, err := db.Begin()
+
+	if err != nil {
+		tx.Rollback()
+		errors.Message = structs.QueryErr
+		errors.Data = cert.CertName
+		errors.SysMessage = err.Error()
+		errors.Code = http.StatusInternalServerError
+		return &errors
+	}
+
+	insertCert := "insert into tutor_certificates (cert_name, cert_date, status, tutor_id) values (?, ?, ?, ?)"
+	updateCert := "update tutor_certificates set cert_name = ?, cert_date = ?, status = ?, updated_at = now(), updated_by = 'API' where id = ?"
+
+	if cert.ID != 0 {
+		queryStr = updateCert
+		refID = cert.ID
+	} else {
+		queryStr = insertCert
+		refID = cert.TutorID
+	}
+
+	_, err2 := tx.Exec(queryStr, &cert.CertName, &cert.CertDate, &cert.Status, &refID)
+	if err2 != nil {
+		tx.Rollback()
+		errors.Message = structs.QueryErr
+		errors.Data = cert.CertName
+		errors.SysMessage = err2.Error()
+		errors.Code = http.StatusInternalServerError
+		return &errors
+	}
+
+	errors.Message = structs.Success
+	errors.Data = cert.CertName
+	errors.Code = http.StatusOK
+	tx.Commit()
+	return &errors
+}
+
+//UpdateExperiences is the func to create/update the experiences in tutor entity. please note that status = 0 (soft delete)
+func (*repo) UpdateExperiences(exp structs.TutorExperience) *structs.ErrorMessage {
+	var errors structs.ErrorMessage
+	var queryStr string
+	var refID int
+
+	db := mysql.InitializeMySQL()
+	tx, err := db.Begin()
+
+	if err != nil {
+		tx.Rollback()
+		errors.Message = structs.QueryErr
+		errors.Data = exp.ExpName
+		errors.SysMessage = err.Error()
+		errors.Code = http.StatusInternalServerError
+		return &errors
+	}
+
+	insertExp := "insert into tutor_experiences (exp_name, description, years, status, tutor_id) values (?, ?, ?, ?, ?)"
+	updateExp := "update tutor_experiences set exp_name = ?, description = ?, years = ?, status = ?, updated_at = now(), updated_by = 'API' where id = ?"
+
+	if exp.ID != 0 {
+		queryStr = updateExp
+		refID = exp.ID
+	} else {
+		queryStr = insertExp
+		refID = exp.TutorID
+	}
+
+	_, err2 := tx.Exec(queryStr, &exp.ExpName, &exp.Description, &exp.Years, &exp.Status, &refID)
+	if err2 != nil {
+		tx.Rollback()
+		errors.Message = structs.QueryErr
+		errors.Data = exp.ExpName
+		errors.SysMessage = err2.Error()
+		errors.Code = http.StatusInternalServerError
+		return &errors
+	}
+
+	errors.Message = structs.Success
+	errors.Data = exp.ExpName
+	errors.Code = http.StatusOK
+	tx.Commit()
+	return &errors
+}
+
+//UpdateJournals is the func to create/update the journal in tutor entity. please note that status = 0 (soft delete)
+func (*repo) UpdateJournals(jour structs.TutorJournal) *structs.ErrorMessage {
+	var errors structs.ErrorMessage
+	var queryStr string
+	var refID int
+
+	db := mysql.InitializeMySQL()
+	tx, err := db.Begin()
+
+	if err != nil {
+		tx.Rollback()
+		errors.Message = structs.QueryErr
+		errors.Data = jour.JourName
+		errors.SysMessage = err.Error()
+		errors.Code = http.StatusInternalServerError
+		return &errors
+	}
+
+	insertJour := "insert into tutor_journals (journal_name, publish_at, publish_date, status, tutor_id) values (?, ?, ?, ?, ?)"
+	updateJour := "update tutor_journals set journal_name = ?, publish_at = ?, publish_date = ?, status = ?, updated_at = now(), updated_by = 'API' where id = ?"
+
+	if jour.ID != 0 {
+		queryStr = updateJour
+		refID = jour.ID
+	} else {
+		queryStr = insertJour
+		refID = jour.TutorID
+	}
+
+	_, err2 := tx.Exec(queryStr, &jour.JourName, &jour.PublishAt, &jour.PublishDate, &jour.Status, &refID)
+	if err2 != nil {
+		tx.Rollback()
+		errors.Message = structs.QueryErr
+		errors.Data = jour.JourName
+		errors.SysMessage = err2.Error()
+		errors.Code = http.StatusInternalServerError
+		return &errors
+	}
+
+	errors.Message = structs.Success
+	errors.Data = jour.JourName
+	errors.Code = http.StatusOK
+	tx.Commit()
+	return &errors
+}
+
 //UpdateEducations is the func to create/update the education in tutor entity. please note that status = 0 (soft delete)
 func (*repo) UpdateEducations(edu structs.TutorEducation) *structs.ErrorMessage {
-
 	var errors structs.ErrorMessage
 	var queryStr string
 	var refID int
@@ -486,7 +623,52 @@ func (*repo) UpdateEducations(edu structs.TutorEducation) *structs.ErrorMessage 
 	errors.Code = http.StatusOK
 	tx.Commit()
 	return &errors
+}
 
+//UpdateResearches is the func to create/update the journal in tutor entity. please note that status = 0 (soft delete)
+func (*repo) UpdateResearches(res structs.TutorResearch) *structs.ErrorMessage {
+	var errors structs.ErrorMessage
+	var queryStr string
+	var refID int
+
+	db := mysql.InitializeMySQL()
+	tx, err := db.Begin()
+
+	if err != nil {
+		tx.Rollback()
+		errors.Message = structs.QueryErr
+		errors.Data = res.ResName
+		errors.SysMessage = err.Error()
+		errors.Code = http.StatusInternalServerError
+		return &errors
+	}
+
+	insertRsch := "insert into tutor_researches (res_name, description, years, status, tutor_id) values (?, ?, ?, ?, ?)"
+	updateRsch := "update tutor_researches set res_name = ?, description = ?, years = ?, status = ?, updated_at = now(), updated_by = 'API' where id = ?"
+
+	if res.ID != 0 {
+		queryStr = updateRsch
+		refID = res.ID
+	} else {
+		queryStr = insertRsch
+		refID = res.ID
+	}
+
+	_, err2 := tx.Exec(queryStr, &res.ResName, &res.Description, &res.Years, &res.Status, &refID)
+	if err2 != nil {
+		tx.Rollback()
+		errors.Message = structs.QueryErr
+		errors.Data = res.ResName
+		errors.SysMessage = err2.Error()
+		errors.Code = http.StatusInternalServerError
+		return &errors
+	}
+
+	errors.Message = structs.Success
+	errors.Data = res.ResName
+	errors.Code = http.StatusOK
+	tx.Commit()
+	return &errors
 }
 
 //CheckEmail is the func to check registered/updated email

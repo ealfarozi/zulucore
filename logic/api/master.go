@@ -9,7 +9,6 @@ import (
 	"github.com/ealfarozi/zulucore/common"
 	"github.com/ealfarozi/zulucore/repositories/mysql"
 	"github.com/ealfarozi/zulucore/structs"
-	"github.com/gorilla/mux"
 	"gopkg.in/go-playground/validator.v9"
 )
 
@@ -62,114 +61,6 @@ func CreateInstitutions(w http.ResponseWriter, r *http.Request) {
 
 	tx.Commit()
 	json.NewEncoder(w).Encode(errstr)
-}
-
-//GetInstitutions is func to fulfill the dropbox in FE
-func GetInstitutions(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	var institutions []structs.Institution
-	//var FullMapID, BillMapID int
-	db := mysql.InitializeMySQL()
-
-	sqlQuery := "select id, code, name, street_address, street_map_id, bill_address, bill_map_id, pic_name, pic_phone, expired_at, status from institutions"
-
-	res, err := db.Query(sqlQuery)
-	defer mysql.CloseRows(res)
-	if err != nil {
-		common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if res != nil {
-
-		for res.Next() {
-			institution := structs.Institution{}
-			addr := structs.Address{}
-			res.Scan(&institution.ID, &institution.Code, &institution.Name, &institution.Street, &institution.MapID, &institution.BillStreet, &institution.BillMapID, &institution.PICName, &institution.PICPhone, &institution.ExpireAt, &institution.Status)
-
-			if institution.MapID != 0 && institution.BillMapID != 0 {
-
-				//get Address
-				sqlQueryAddress := "select id, province_id, province_name, city_id, city_name, kecamatan_id, kecamatan_name, kelurahan_id, kelurahan_name, zipcode from address_map where id = ?"
-				res, err := db.Query(sqlQueryAddress, institution.MapID)
-				res2, err2 := db.Query(sqlQueryAddress, institution.BillMapID)
-				defer mysql.CloseRows(res)
-				defer mysql.CloseRows(res2)
-				if err != nil {
-					common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-					return
-				}
-				if err2 != nil {
-					common.JSONError(w, structs.QueryErr, err2.Error(), http.StatusInternalServerError)
-					return
-				}
-				for res.Next() {
-					res.Scan(&addr.ID, &addr.ProvinceID, &addr.ProvinceName, &addr.CityID, &addr.CityName, &addr.KecamatanID, &addr.KecamatanName, &addr.KelurahanID, &addr.KelurahanName, &addr.ZipCode)
-					institution.FullAddress = addr
-				}
-				for res2.Next() {
-					res2.Scan(&addr.ID, &addr.ProvinceID, &addr.ProvinceName, &addr.CityID, &addr.CityName, &addr.KecamatanID, &addr.KecamatanName, &addr.KelurahanID, &addr.KelurahanName, &addr.ZipCode)
-					institution.BillFullAddress = addr
-				}
-			}
-			institutions = append(institutions, institution)
-		}
-		json.NewEncoder(w).Encode(institutions)
-	}
-}
-
-//GetInstitution is func to fulfill the dropbox in FE
-func GetInstitution(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	var prm string
-	var FullMapID int
-	var BillMapID int
-
-	institution := structs.Institution{}
-	addr := structs.Address{}
-
-	params := mux.Vars(r)
-	db := mysql.InitializeMySQL()
-
-	sqlQuery := "select id, code, name, street_address, street_map_id, bill_address, bill_map_id, pic_name, pic_phone, expired_at, status from institutions where "
-
-	if r.FormValue("insId") != "" {
-		sqlQuery += "id = ?"
-		prm = r.FormValue("insId")
-	}
-	if r.FormValue("insCode") != "" {
-		sqlQuery += "code = ?"
-		prm = r.FormValue("insCode")
-		log.Println(params)
-	}
-
-	err := db.QueryRow(sqlQuery, prm).Scan(&institution.ID, &institution.Code, &institution.Name, &institution.Street, &FullMapID, &institution.BillStreet, &BillMapID, &institution.PICName, &institution.PICPhone, &institution.ExpireAt, &institution.Status)
-	if err != nil {
-		common.JSONError(w, structs.ErrNotFound, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	//get Address
-	sqlQueryAddress := "select id, province_id, province_name, city_id, city_name, kecamatan_id, kecamatan_name, kelurahan_id, kelurahan_name, zipcode from address_map where id = ?"
-	res, err := db.Query(sqlQueryAddress, FullMapID)
-	res2, err2 := db.Query(sqlQueryAddress, BillMapID)
-	defer mysql.CloseRows(res)
-	defer mysql.CloseRows(res2)
-	if err != nil || err2 != nil {
-		common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	for res.Next() {
-		res.Scan(&addr.ID, &addr.ProvinceID, &addr.ProvinceName, &addr.CityID, &addr.CityName, &addr.KecamatanID, &addr.KecamatanName, &addr.KelurahanID, &addr.KelurahanName, &addr.ZipCode)
-		institution.FullAddress = addr
-	}
-	for res2.Next() {
-		res2.Scan(&addr.ID, &addr.ProvinceID, &addr.ProvinceName, &addr.CityID, &addr.CityName, &addr.KecamatanID, &addr.KecamatanName, &addr.KelurahanID, &addr.KelurahanName, &addr.ZipCode)
-		institution.BillFullAddress = addr
-	}
-
-	json.NewEncoder(w).Encode(institution)
 }
 
 //GetReferences is func to get any refs in references table
