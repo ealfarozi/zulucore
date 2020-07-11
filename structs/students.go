@@ -41,7 +41,7 @@ type StudentDetails struct {
 	Email         string  `json:"email"  validate:"email"`
 	InsSource     string  `json:"institution_name,omitempty"`
 	JoinDate      string  `json:"join_date,omitempty"`
-	StudentID     int     `json:"student_id,omitempty" validate:"required"`
+	StudentID     int     `json:"student_id,omitempty"`
 	TutorID       int     `json:"tutor_id,omitempty"`
 	UserID        int     `json:"user_id,omitempty"`
 	StreetAddress string  `json:"street_address,omitempty"`

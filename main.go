@@ -17,6 +17,10 @@ var (
 	insRepository interfaces.InstitutionRepository = repositories.NewInstitutionRepository()
 	insService    service.InstitutionService       = service.NewInstitutionService(insRepository)
 	insLogic      api.InstitutionLogic             = api.NewInstitutionLogic(insService)
+
+	stdRepository interfaces.StudentRepository = repositories.NewStudentRepository()
+	stdService    service.StudentService       = service.NewStudentService(stdRepository)
+	stdLogic      api.StudentLogic             = api.NewStudentLogic(stdService)
 )
 
 func main() {
@@ -42,11 +46,11 @@ func main() {
 	httpRouter.POST("/api/v1/tutor/journals", tutorLogic.UpdateJournals)
 	httpRouter.POST("/api/v1/tutor/researches", tutorLogic.UpdateResearches)
 
-	httpRouter.POST("/api/v1/students", api.CreateStudents)
-	httpRouter.GET("/api/v1/students", api.GetStudents)
-	httpRouter.GET("/api/v1/student", api.GetStudent)
-	httpRouter.GET("/api/v1/student/details", api.GetStudentDetails)
-	httpRouter.POST("/api/v1/student/details", api.UpdateStudentDetais)
+	httpRouter.POST("/api/v1/students", stdLogic.CreateStudents)
+	httpRouter.GET("/api/v1/students", stdLogic.GetStudents)
+	httpRouter.GET("/api/v1/student", stdLogic.GetStudent)
+	httpRouter.GET("/api/v1/student/details", stdLogic.GetStudentDetails)
+	httpRouter.POST("/api/v1/student/details", stdLogic.UpdateStudentDetails)
 
 	httpRouter.SERVE(":8000")
 }

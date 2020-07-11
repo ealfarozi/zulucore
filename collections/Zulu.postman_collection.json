@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ea25d587-deba-4fa8-8ee6-469a00826fde",
+		"_postman_id": "d4a79054-8f2c-4166-aa42-d914638c12f1",
 		"name": "Zulu",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -14,7 +14,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "4a6fe6c4-0fe4-409c-9a83-36542af2053b",
+								"id": "524127ea-37df-4026-a699-cfa007d2c158",
 								"exec": [
 									"var data = pm.response.json();",
 									"pm.environment.set(\"token\", data.data.access_token);"
@@ -541,7 +541,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n   {\n      \"code\":\"Borobudur\",\n      \"name\":\"Universitas Borobudur\",\n      \"street_address\":\"Jl. Raya Kalimalang No.1, RT.18/RW.3\",\n      \"address_map_id\":5490,\n      \"bill_address\":\"Jl. Raya Kalimalang No.1, RT.18/RW.3\",\n      \"bill_address_map_id\":5490,\n      \"pic_name\":\"DDD\",\n      \"pic_phone\":\"0819\",\n      \"expire_at\":\"2020-07-29\"\n   },{\n      \"code\":\"Trisakti2\",\n      \"name\":\"Universitas Trisakti\",\n      \"street_address\":\"Jl. Kyai Tapa No.1\",\n      \"address_map_id\":1200,\n      \"bill_address\":\"Jl. Kyai Tapa No.1\",\n      \"bill_address_map_id\":1201,\n      \"pic_name\":\"DSA\",\n      \"pic_phone\":\"0817\",\n      \"expire_at\":\"2020-07-29\"\n   }\n]",
+							"raw": "[\n   {\n      \"code\":\"Bor2\",\n      \"name\":\"Universitas Borobudur\",\n      \"street_address\":\"Jl. Raya Kalimalang No.1, RT.18/RW.3\",\n      \"address_map_id\":5490,\n      \"bill_address\":\"Jl. Raya Kalimalang No.1, RT.18/RW.3\",\n      \"bill_address_map_id\":5490,\n      \"pic_name\":\"DDD\",\n      \"pic_phone\":\"0819\",\n      \"expire_at\":\"2020-07-29\"\n   },{\n      \"code\":\"Trisakti3\",\n      \"name\":\"Universitas Trisakti\",\n      \"street_address\":\"Jl. Kyai Tapa No.1\",\n      \"address_map_id\":1200,\n      \"bill_address\":\"Jl. Kyai Tapa No.1\",\n      \"bill_address_map_id\":1201,\n      \"pic_name\":\"DSA\",\n      \"pic_phone\":\"0817\",\n      \"expire_at\":\"2020-07-29\"\n   }\n]",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1177,7 +1177,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n    {\n        \"nomor_induk\": \"NoInduk_03\",\n        \"name\": \"Asep\",\n        \"degree_id\": 4,     \n        \"type_id\":1,   \n        \"curriculum_id\":1,\n        \"institution_id\": 13,\n        \"user_id\":30,\n        \"details\": {\n            \"kk_no\": \"KK-1283818203891028312\",\n            \"ktp\": \"1283818203891028312\",\n            \"sim\": \"1283182312312\",\n            \"npwp\": \"128379182731\",\n            \"gender_id\": 1,\n            \"pob_id\": 1000,\n            \"dob\": \"1990-05-05\",\n            \"phone\": \"081234567895\",\n            \"email\": \"asdasd@asd.com\",\n            \"street_address\": \"Jalan Raya ajah\",\n            \"address_map_id\": 7880,\n            \"institution_name\": \"TK Mekar Sari\",\n            \"join_date\": \"2000-01-01\"\n        }\n    },\n    {\n        \"nomor_induk\": \"NoInduk_04\",\n        \"name\": \"Dani\",\n        \"degree_id\": 5,     \n        \"type_id\":1,   \n        \"curriculum_id\":1,\n        \"institution_id\": 14,\n        \"details\": {\n            \"kk_no\": \"KK-1283818203891028DF\",                                    \n            \"gender_id\": 1,\n            \"pob_id\": 1000,\n            \"dob\": \"1990-05-05\",\n            \"phone\": \"081234567895\",\n            \"email\": \"asdasd@asd.com\",\n            \"street_address\": \"Jalan Raya ajah\",\n            \"address_map_id\": 7880,\n            \"institution_name\": \"Belum pernah sekolah\",\n            \"join_date\": \"2000-01-01\"\n        }\n    }\n]",
+							"raw": "[\n    {\n        \"nomor_induk\": \"NoInduk_05\",\n        \"name\": \"Asep\",\n        \"degree_id\": 4,     \n        \"type_id\":1,   \n        \"curriculum_id\":1,\n        \"institution_id\": 13,\n        \"user_id\":30,\n        \"details\": {\n            \"kk_no\": \"KK-1283818203891028312\",\n            \"ktp\": \"1283818203891028312\",\n            \"sim\": \"1283182312312\",\n            \"npwp\": \"128379182731\",\n            \"gender_id\": 1,\n            \"pob_id\": 1000,\n            \"dob\": \"1990-05-05\",\n            \"phone\": \"081234567895\",\n            \"email\": \"asdasd@asdd.com\",\n            \"street_address\": \"Jalan Raya ajah\",\n            \"address_map_id\": 7880,\n            \"institution_name\": \"TK Mekar Sari\",\n            \"join_date\": \"2000-01-01\"\n        }\n    },\n    {\n        \"nomor_induk\": \"NoInduk_04\",\n        \"name\": \"Dani\",\n        \"degree_id\": 5,     \n        \"type_id\":1,   \n        \"curriculum_id\":1,\n        \"institution_id\": 14,\n        \"details\": {\n            \"kk_no\": \"KK-1283818203891028DF\",                                    \n            \"gender_id\": 1,\n            \"pob_id\": 1000,\n            \"dob\": \"1990-05-05\",\n            \"phone\": \"081234567895\",\n            \"email\": \"asdasd@asd.com\",\n            \"street_address\": \"Jalan Raya ajah\",\n            \"address_map_id\": 7880,\n            \"institution_name\": \"Belum pernah sekolah\",\n            \"join_date\": \"2000-01-01\"\n        }\n    }\n]",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1211,7 +1211,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n    {\n    \"id\": 93,\n    \"nomor_induk\": \"NoInduk_01\",\n    \"name\": \"Asep\",\n    \"degree_id\": 4,\n    \"type_id\": 1,\n    \"institution_id\":13,\n    \"curriculum_id\": 1,\n    \"user_id\": 28,\n    \"status\": 1,\n    \"details\": {\n        \"id\": 26,\n        \"kk_no\": \"KK-12838182\",\n        \"ktp\": \"12838182\",\n        \"sim\": \"1283182312312\",\n        \"npwp\": \"128379182731\",\n        \"gender_id\": 1,\n        \"pob_id\": 1000,\n        \"dob\": \"1990-05-05\",\n        \"phone\": \"081234567895\",\n        \"email\": \"asdasd@asd.com\",\n        \"institution_name\": \"TK Mekar Sari\",\n        \"join_date\": \"2000-01-01\",\n        \"street_address\": \"Jalan Raya ajah\",\n        \"address_map_id\": 7880\n    }\n}\n]",
+							"raw": "[\n    {\n    \"id\": 93,\n    \"nomor_induk\": \"NoInduk_01\",\n    \"name\": \"Asep\",\n    \"degree_id\": 4,\n    \"type_id\": 1,\n    \"institution_id\":13,\n    \"curriculum_id\": 1,\n    \"user_id\": 28,\n    \"status\": 1,\n    \"details\": {\n        \"id\": 32,\n        \"kk_no\": \"KK-128328232\",\n        \"ktp\": \"12838182\",\n        \"sim\": \"1283182312312\",\n        \"npwp\": \"128379182731\",\n        \"gender_id\": 1,\n        \"pob_id\": 100,\n        \"dob\": \"1990-05-05\",\n        \"phone\": \"081234567895\",\n        \"email\": \"asdasd@asd.com\",\n        \"institution_name\": \"TK Mekar Sari\",\n        \"join_date\": \"2000-01-01\",\n        \"street_address\": \"Jalan Raya ajah\",\n        \"address_map_id\": 7880\n    }\n}\n]",
 							"options": {
 								"raw": {
 									"language": "json"

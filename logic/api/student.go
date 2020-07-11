@@ -2,102 +2,96 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/ealfarozi/zulucore/common"
-	"github.com/ealfarozi/zulucore/repositories/mysql"
+	"github.com/ealfarozi/zulucore/interfaces"
+	"github.com/ealfarozi/zulucore/repositories"
+	"github.com/ealfarozi/zulucore/service"
 	"github.com/ealfarozi/zulucore/structs"
-	"gopkg.in/go-playground/validator.v9"
 )
 
+type stdLogic struct{}
+
+var (
+	stdService service.StudentService
+	stdRepo    interfaces.StudentRepository = repositories.NewStudentRepository()
+)
+
+//TutorLogic is the interface of httpRequest for Tutor
+type StudentLogic interface {
+	CreateStudents(w http.ResponseWriter, r *http.Request)
+	UpdateStudentDetails(w http.ResponseWriter, r *http.Request)
+	GetStudentDetails(w http.ResponseWriter, r *http.Request)
+	GetStudents(w http.ResponseWriter, r *http.Request)
+	GetStudent(w http.ResponseWriter, r *http.Request)
+}
+
+//NewTutorLogic is the func to calling the constructor of tutor interface
+func NewStudentLogic(service service.StudentService) StudentLogic {
+	stdService = service
+	return &stdLogic{}
+}
+
 //CreateStudents is the func to insert the student data
-func CreateStudents(w http.ResponseWriter, r *http.Request) {
+func (*stdLogic) CreateStudents(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	var stds []structs.Student
+	var errs []structs.ErrorMessage
 
-	var students []structs.Student
-	var errstr structs.ErrorMessage
+	_ = json.NewDecoder(r.Body).Decode(&stds)
 
-	_ = json.NewDecoder(r.Body).Decode(&students)
-
-	db := mysql.InitializeMySQL()
-	tx, err := db.Begin()
-
-	//start checking insert
-	if err != nil {
-		tx.Rollback()
-		common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	j := 0
-	for range students {
-		check := common.CheckNomorIndukStd(students[j].InsID, students[j].NomorInduk, 0)
-
-		if check != 0 {
-			tx.Rollback()
-			fmt.Printf(students[j].NomorInduk)
-			common.JSONError(w, structs.NomorInd, "", http.StatusInternalServerError)
-			return
+	for j := range stds {
+		std, errStr := stdService.Validate(&stds[j])
+		if errStr != nil {
+			errs = append(errs, *errStr)
+			continue
 		}
 
-		sqlQuery := "insert into students (nomor_induk, name, degree_id, student_type_id, curr_id) values (?, ?, ?, ?, ?)"
-		res, err := tx.Exec(sqlQuery, &students[j].NomorInduk, &students[j].Name, &students[j].DegreeID, &students[j].StudentType, &students[j].CurrID)
-		if err != nil {
-			tx.Rollback()
-			common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-			return
+		checkNomorInduk := stdService.CheckNomorIndukStd(stds[j].InsID, stds[j].NomorInduk, 0)
+		if checkNomorInduk != 0 {
+			errStr := structs.ErrorMessage{Data: stds[j].NomorInduk, Message: structs.NomorInd, SysMessage: "", Code: http.StatusInternalServerError}
+			errs = append(errs, errStr)
+			continue
 		}
 
-		lastID, err := res.LastInsertId()
-		lastStudentID := int(lastID)
-		if err != nil {
-			tx.Rollback()
-			common.JSONError(w, structs.LastIDErr, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		//insert details
-		if students[j].Details != nil {
-			students[j].Details.StudentID = lastStudentID
-			students[j].Details.UserID = students[j].UserID
-
-			sqlQueryDetail := "insert into student_details (kk_no, ktp, sim, npwp, gender_id, pob_id, dob, phone, email, street_address, address_id, institution_source_name, join_date, student_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-			res, err := tx.Exec(sqlQueryDetail, &students[j].Details.KkNO, &students[j].Details.Ktp, &students[j].Details.Sim, &students[j].Details.Npwp, &students[j].Details.GenderID, &students[j].Details.PobID, &students[j].Details.Dob, &students[j].Details.Phone, &students[j].Details.Email, &students[j].Details.StreetAddress, &students[j].Details.AddressID, &students[j].Details.InsSource, &students[j].Details.JoinDate, &lastStudentID)
-			if err != nil {
-				tx.Rollback()
-				common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-				return
-			}
-
-			lastID, err := res.LastInsertId()
-			if err != nil {
-				tx.Rollback()
-				common.JSONError(w, structs.LastIDErr, err.Error(), http.StatusInternalServerError)
-				log.Println(lastID)
-				return
+		if stds[j].Details != nil {
+			checkEmail := stdService.CheckEmail(stds[j].Details.Email, stds[j].UserID)
+			if checkEmail != 0 {
+				errStr := structs.ErrorMessage{Data: stds[j].NomorInduk, Message: structs.Email, SysMessage: "", Code: http.StatusInternalServerError}
+				errs = append(errs, errStr)
+				continue
 			}
 		}
 
-		v := validator.New()
-		err = v.Struct(students[j])
-		if err != nil {
-			tx.Rollback()
-			common.JSONError(w, structs.Validate, err.Error(), http.StatusInternalServerError)
-			return
+		errStr = stdService.CreateStudents(*std)
+		if errStr.Code != http.StatusOK {
+			errs = append(errs, *errStr)
+			continue
+		} else {
+			errs = append(errs, structs.ErrorMessage{Data: stds[j].NomorInduk, Message: structs.Success, SysMessage: "", Code: http.StatusOK})
 		}
-
-		errstr.Message = structs.Success
-		errstr.Code = http.StatusOK
-		j++
 	}
-	tx.Commit()
-	json.NewEncoder(w).Encode(errstr)
+	common.JSONErrs(w, &errs)
+	return
+
 }
 
 //GetStudent is the func to get the student list based on nomor induk and name
-func GetStudent(w http.ResponseWriter, r *http.Request) {
+
+func (*stdLogic) GetStudent(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	std, errStr := stdService.GetStudent(r.FormValue("nomor_induk"), r.FormValue("name"), r.FormValue("institution_id"))
+
+	if errStr != nil {
+		common.JSONErr(w, errStr)
+		return
+	}
+	json.NewEncoder(w).Encode(std)
+}
+
+/*
 	w.Header().Set("Content-Type", "application/json")
 	var prm string
 
@@ -134,159 +128,77 @@ func GetStudent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-
+*/
 //GetStudents in the db (all)
-func GetStudents(w http.ResponseWriter, r *http.Request) {
+func (*stdLogic) GetStudents(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var students []structs.Student
+	std, errStr := stdService.GetStudents(r.FormValue("institution_id"))
 
-	db := mysql.InitializeMySQL()
-
-	sqlQuery := "SELECT std.id, std.nomor_induk, std.name, std.degree_id, std.student_type_id, std.curr_id, std.user_id, std.status FROM students std inner join (select user_id from user_roles where institution_id = ?) ur on std.user_id = ur.user_id "
-
-	res, err := db.Query(sqlQuery, r.FormValue("institution_id"))
-	defer mysql.CloseRows(res)
-	if err != nil {
-		common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
+	if errStr != nil {
+		common.JSONErr(w, errStr)
 		return
 	}
-
-	student := structs.Student{}
-	for res.Next() {
-		res.Scan(&student.ID, &student.NomorInduk, &student.Name, &student.DegreeID, &student.StudentType, &student.CurrID, &student.UserID, &student.Status)
-		students = append(students, student)
-	}
-
-	if len(students) != 0 {
-		json.NewEncoder(w).Encode(students)
-	} else {
-		common.JSONError(w, structs.ErrNotFound, "", http.StatusInternalServerError)
-		return
-	}
+	json.NewEncoder(w).Encode(std)
 }
 
 //GetStudentDetails is the func to get the student details based on student_id
-func GetStudentDetails(w http.ResponseWriter, r *http.Request) {
+func (*stdLogic) GetStudentDetails(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var student structs.Student
-	var det structs.StudentDetails
+	std, errStr := stdService.GetStudentDetails(r.FormValue("student_id"))
 
-	db := mysql.InitializeMySQL()
-	sqlQueryStudent := "select id, nomor_induk, name, degree_id, student_type_id, curr_id, user_id, status from students where id = ?"
-	err := db.QueryRow(sqlQueryStudent, r.FormValue("student_id")).Scan(&student.ID, &student.NomorInduk, &student.Name, &student.DegreeID, &student.StudentType, &student.CurrID, &student.UserID, &student.Status)
-	if err != nil {
-		common.JSONError(w, structs.ErrNotFound, err.Error(), http.StatusInternalServerError)
+	if errStr != nil {
+		common.JSONErr(w, errStr)
 		return
 	}
-
-	//Details
-	sqlQueryDetail := "select id, kk_no, ktp, sim, npwp, gender_id, pob_id, dob, phone, email, street_address, address_id, institution_source_name, join_date, tutor_id from student_details where student_id = ?"
-	resDet, err := db.Query(sqlQueryDetail, r.FormValue("student_id"))
-	defer mysql.CloseRows(resDet)
-	for resDet.Next() {
-		resDet.Scan(&det.ID, &det.KkNO, &det.Ktp, &det.Sim, &det.Npwp, &det.GenderID, &det.PobID, &det.Dob, &det.Phone, &det.Email, &det.StreetAddress, &det.AddressID, &det.InsSource, &det.JoinDate, &det.TutorID)
-		student.Details = &det
-		student.Details.AddressDetail = common.GetAddressOnly(det.AddressID)
-	}
-
-	json.NewEncoder(w).Encode(student)
+	json.NewEncoder(w).Encode(std)
 }
 
 //UpdateDetails is the func to create/update the student detail (ONLY) on Frontend side for student entity. the update will includes nomor_induk and student_name as well
 //please note that status = 0 = soft delete.
 //In order to create a new student please refer to CreateStudents func
 //email field should be coming from Login func
-func UpdateStudentDetais(w http.ResponseWriter, r *http.Request) {
+func (*stdLogic) UpdateStudentDetails(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	var stds []structs.Student
+	var errs []structs.ErrorMessage
 
-	var students []structs.Student
-	var errstr structs.ErrorMessage
+	_ = json.NewDecoder(r.Body).Decode(&stds)
 
-	_ = json.NewDecoder(r.Body).Decode(&students)
-
-	db := mysql.InitializeMySQL()
-	tx, err := db.Begin()
-
-	if err != nil {
-		tx.Rollback()
-		common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	//updating email will update the username in users table
-	insertDet := "insert into student_details (kk_no, ktp, sim, npwp, gender_id, pob_id, dob, phone, email, street_address, address_id, institution_source_name, join_date, student_id, tutor_id, user_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-	updateDet := "update student_details set kk_no = ?, ktp = ?, sim = ?, npwp = ?, gender_id = ?, pob_id = ?, dob = ?, phone = ?, email = ?, street_address = ?, address_id = ?, institution_source_name = ?, join_date = ?, tutor_id = ?, updated_at = now(), updated_by = 'API' where id = ?"
-	updateStd := "update students set nomor_induk = ?, name = ?, degree_id = ?, student_type_id = ?, curr_id = ?, status = ? where id = ?"
-	updateUsr := "update users set username = ? where id = ?"
-
-	j := 0
-	for range students {
-		students[j].Details.StudentID = students[j].ID
-		v := validator.New()
-		err = v.Struct(students[j])
-		if err != nil {
-			tx.Rollback()
-			common.JSONError(w, structs.Validate, err.Error(), http.StatusInternalServerError)
-			return
+	for j := range stds {
+		std, errStr := stdService.Validate(&stds[j])
+		if errStr != nil {
+			errs = append(errs, *errStr)
+			continue
 		}
 
-		checkNmrInduk := common.CheckNomorIndukStd(students[j].InsID, students[j].NomorInduk, students[j].ID)
-
-		if checkNmrInduk != 0 {
-			tx.Rollback()
-			common.JSONError(w, structs.NomorInd, "", http.StatusInternalServerError)
-			return
+		checkNomorInduk := stdService.CheckNomorIndukStd(stds[j].InsID, stds[j].NomorInduk, stds[j].ID)
+		if checkNomorInduk != 0 {
+			errStr := structs.ErrorMessage{Data: stds[j].NomorInduk, Message: structs.NomorInd, SysMessage: "", Code: http.StatusInternalServerError}
+			errs = append(errs, errStr)
+			continue
 		}
 
-		checkEmail := common.CheckEmail(students[j].Details.Email, students[j].UserID)
-
-		if checkEmail != 0 {
-			tx.Rollback()
-			common.JSONError(w, structs.Email, "", http.StatusInternalServerError)
-			return
+		if stds[j].Details != nil {
+			checkEmail := stdService.CheckEmail(stds[j].Details.Email, stds[j].UserID)
+			if checkEmail != 0 {
+				errStr := structs.ErrorMessage{Data: stds[j].NomorInduk, Message: structs.Email, SysMessage: "", Code: http.StatusInternalServerError}
+				errs = append(errs, errStr)
+				continue
+			}
 		}
 
-		if students[j].ID != 0 {
-			//update
-			_, err := tx.Exec(updateDet, &students[j].Details.KkNO, &students[j].Details.Ktp, &students[j].Details.Sim, &students[j].Details.Npwp, &students[j].Details.GenderID, &students[j].Details.PobID, &students[j].Details.Dob, &students[j].Details.Phone, &students[j].Details.Email, &students[j].Details.StreetAddress, &students[j].Details.AddressID, &students[j].Details.InsSource, &students[j].Details.JoinDate, &students[j].Details.TutorID, &students[j].Details.ID)
-			if err != nil {
-				tx.Rollback()
-				common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-				return
-			}
-
-			_, err2 := tx.Exec(updateStd, &students[j].NomorInduk, &students[j].Name, &students[j].DegreeID, &students[j].StudentType, &students[j].CurrID, &students[j].Status, &students[j].ID)
-			if err2 != nil {
-				tx.Rollback()
-				common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-				return
-			}
-
-			_, err3 := tx.Exec(updateUsr, &students[j].Details.Email, &students[j].UserID)
-			if err3 != nil {
-				tx.Rollback()
-				common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-				return
-			}
-
+		errStr = stdService.UpdateStudentDetails(*std)
+		if errStr.Code != http.StatusOK {
+			errs = append(errs, *errStr)
+			continue
 		} else {
-			//insert
-			_, err := tx.Exec(insertDet, &students[j].Details.KkNO, &students[j].Details.Ktp, &students[j].Details.Sim, &students[j].Details.Npwp, &students[j].Details.GenderID, &students[j].Details.PobID, &students[j].Details.Dob, &students[j].Details.Phone, &students[j].Details.Email, &students[j].Details.StreetAddress, &students[j].Details.AddressID, &students[j].Details.InsSource, &students[j].Details.JoinDate, &students[j].ID, &students[j].Details.TutorID, &students[j].UserID)
-			if err != nil {
-				tx.Rollback()
-				common.JSONError(w, structs.QueryErr, err.Error(), http.StatusInternalServerError)
-				return
-			}
+			errs = append(errs, structs.ErrorMessage{Data: stds[j].NomorInduk, Message: structs.Success, SysMessage: "", Code: http.StatusOK})
 		}
-		j++
 	}
-
-	errstr.Message = structs.Success
-	errstr.Code = http.StatusOK
-	tx.Commit()
-	json.NewEncoder(w).Encode(errstr)
+	common.JSONErrs(w, &errs)
+	return
 }
 
 //UpdateParents is the func to update the student's parents information
