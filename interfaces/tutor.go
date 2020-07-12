@@ -5,9 +5,9 @@ import (
 )
 
 type TutorRepository interface {
-	GetTutors(insID string) (*[]structs.Tutor, *structs.ErrorMessage)
+	GetTutors(insID string, page string, limit string) (*[]structs.Tutor, *structs.ErrorMessage)
 	GetTutorDetails(tutorID string) (*structs.Tutor, *structs.ErrorMessage)
-	GetTutor(nmrInd string, name string, insID string) (*[]structs.Tutor, *structs.ErrorMessage)
+	GetTutor(nmrInd string, name string, insID string, page string, limit string) (*[]structs.Tutor, *structs.ErrorMessage)
 	UpdateTutorDetails(tutor structs.Tutor) *structs.ErrorMessage
 	CreateTutors(tutor structs.Tutor) *structs.ErrorMessage
 	UpdateEducations(edu structs.TutorEducation) *structs.ErrorMessage

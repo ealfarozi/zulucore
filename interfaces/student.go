@@ -8,6 +8,6 @@ type StudentRepository interface {
 	CheckNomorIndukStd(insID int, nmrInduk string, stdID int) int
 	UpdateStudentDetails(std structs.Student) *structs.ErrorMessage
 	GetStudentDetails(stdID string) (*structs.Student, *structs.ErrorMessage)
-	GetStudents(insID string) (*[]structs.Student, *structs.ErrorMessage)
-	GetStudent(nmrInduk string, name string, insID string) (*[]structs.Student, *structs.ErrorMessage)
+	GetStudents(insID string, page string, limit string) (*[]structs.Student, *structs.ErrorMessage)
+	GetStudent(nmrInduk string, name string, insID string, page string, limit string) (*[]structs.Student, *structs.ErrorMessage)
 }

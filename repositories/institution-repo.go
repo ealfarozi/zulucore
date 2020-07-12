@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/ealfarozi/zulucore/common"
 	"github.com/ealfarozi/zulucore/interfaces"
 	"github.com/ealfarozi/zulucore/repositories/mysql"
 	"github.com/ealfarozi/zulucore/structs"
@@ -64,7 +65,7 @@ func (*insRepo) CreateInstitutions(insts structs.Institution) *structs.ErrorMess
 }
 
 //GetInstitution is func to fulfill the dropbox in FE
-func (*insRepo) GetInstitution(insID string, insCode string) (*structs.Institution, *structs.ErrorMessage) {
+func (*insRepo) GetInstitution(insID string, insCode string, page string, limit string) (*structs.Institution, *structs.ErrorMessage) {
 	var prm string
 	var FullMapID int
 	var BillMapID int
@@ -85,7 +86,7 @@ func (*insRepo) GetInstitution(insID string, insCode string) (*structs.Instituti
 		sqlQuery += "code = ?"
 		prm = insCode
 	}
-
+	sqlQuery += common.SetPageLimit(page, limit)
 	err := db.QueryRow(sqlQuery, prm).Scan(&ins.ID, &ins.Code, &ins.Name, &ins.Street, &FullMapID, &ins.BillStreet, &BillMapID, &ins.PICName, &ins.PICPhone, &ins.ExpireAt, &ins.Status)
 	if err != nil {
 		errors.Message = structs.ErrNotFound
@@ -119,7 +120,7 @@ func (*insRepo) GetInstitution(insID string, insCode string) (*structs.Instituti
 }
 
 //GetInstitutions is func to fulfill the dropbox in FE
-func (*insRepo) GetInstitutions() (*[]structs.Institution, *structs.ErrorMessage) {
+func (*insRepo) GetInstitutions(page string, limit string) (*[]structs.Institution, *structs.ErrorMessage) {
 
 	var institutions []structs.Institution
 	var errors structs.ErrorMessage
@@ -127,7 +128,7 @@ func (*insRepo) GetInstitutions() (*[]structs.Institution, *structs.ErrorMessage
 	db := mysql.InitializeMySQL()
 
 	sqlQuery := "select id, code, name, street_address, street_map_id, bill_address, bill_map_id, pic_name, pic_phone, expired_at, status from institutions"
-
+	sqlQuery += common.SetPageLimit(page, limit)
 	res, err := db.Query(sqlQuery)
 	defer mysql.CloseRows(res)
 	if err != nil {

@@ -201,7 +201,7 @@ func (*stdRepo) UpdateStudentDetails(std structs.Student) *structs.ErrorMessage 
 }
 
 //GetStudent is the func to get the student list based on nomor induk and name
-func (*stdRepo) GetStudent(nmrInduk string, name string, insID string) (*[]structs.Student, *structs.ErrorMessage) {
+func (*stdRepo) GetStudent(nmrInduk string, name string, insID string, page string, limit string) (*[]structs.Student, *structs.ErrorMessage) {
 	var students []structs.Student
 	var errors structs.ErrorMessage
 	var prm string
@@ -218,6 +218,8 @@ func (*stdRepo) GetStudent(nmrInduk string, name string, insID string) (*[]struc
 		sqlQuery += "std.name like ?"
 		prm = "%" + name + "%"
 	}
+
+	sqlQuery += common.SetPageLimit(page, limit)
 	res, err := db.Query(sqlQuery, insID, prm)
 	defer mysql.CloseRows(res)
 	if err != nil {
@@ -244,14 +246,14 @@ func (*stdRepo) GetStudent(nmrInduk string, name string, insID string) (*[]struc
 }
 
 //GetStudents in the db (all)
-func (*stdRepo) GetStudents(insID string) (*[]structs.Student, *structs.ErrorMessage) {
+func (*stdRepo) GetStudents(insID string, page string, limit string) (*[]structs.Student, *structs.ErrorMessage) {
 	var students []structs.Student
 	var errors structs.ErrorMessage
 
 	db := mysql.InitializeMySQL()
 
 	sqlQuery := "SELECT std.id, std.nomor_induk, std.name, std.degree_id, std.student_type_id, std.curr_id, std.user_id, std.status FROM students std inner join (select user_id from user_roles where institution_id = ?) ur on std.user_id = ur.user_id "
-
+	sqlQuery += common.SetPageLimit(page, limit)
 	res, err := db.Query(sqlQuery, insID)
 	defer mysql.CloseRows(res)
 	if err != nil {

@@ -9,8 +9,8 @@ import (
 )
 
 type InstitutionService interface {
-	GetInstitutions() (*[]structs.Institution, *structs.ErrorMessage)
-	GetInstitution(insID string, insCode string) (*structs.Institution, *structs.ErrorMessage)
+	GetInstitutions(page string, limit string) (*[]structs.Institution, *structs.ErrorMessage)
+	GetInstitution(insID string, insCode string, page string, limit string) (*structs.Institution, *structs.ErrorMessage)
 	CreateInstitutions(ins structs.Institution) *structs.ErrorMessage
 	ValidateInstitution(ins *structs.Institution) *structs.ErrorMessage
 }
@@ -30,12 +30,12 @@ func (*insService) CreateInstitutions(ins structs.Institution) *structs.ErrorMes
 	return insRepo.CreateInstitutions(ins)
 }
 
-func (*insService) GetInstitution(insID string, insCode string) (*structs.Institution, *structs.ErrorMessage) {
-	return insRepo.GetInstitution(insID, insCode)
+func (*insService) GetInstitution(insID string, insCode string, page string, limit string) (*structs.Institution, *structs.ErrorMessage) {
+	return insRepo.GetInstitution(insID, insCode, page, limit)
 }
 
-func (*insService) GetInstitutions() (*[]structs.Institution, *structs.ErrorMessage) {
-	return insRepo.GetInstitutions()
+func (*insService) GetInstitutions(page string, limit string) (*[]structs.Institution, *structs.ErrorMessage) {
+	return insRepo.GetInstitutions(page, limit)
 }
 
 func (*insService) ValidateInstitution(ins *structs.Institution) *structs.ErrorMessage {

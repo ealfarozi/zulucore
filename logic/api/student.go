@@ -78,11 +78,10 @@ func (*stdLogic) CreateStudents(w http.ResponseWriter, r *http.Request) {
 }
 
 //GetStudent is the func to get the student list based on nomor induk and name
-
 func (*stdLogic) GetStudent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	std, errStr := stdService.GetStudent(r.FormValue("nomor_induk"), r.FormValue("name"), r.FormValue("institution_id"))
+	std, errStr := stdService.GetStudent(r.FormValue("nomor_induk"), r.FormValue("name"), r.FormValue("institution_id"), r.FormValue("_page"), r.FormValue("_limit"))
 
 	if errStr != nil {
 		common.JSONErr(w, errStr)
@@ -91,49 +90,11 @@ func (*stdLogic) GetStudent(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(std)
 }
 
-/*
-	w.Header().Set("Content-Type", "application/json")
-	var prm string
-
-	students := []structs.Student{}
-	db := mysql.InitializeMySQL()
-
-	sqlQuery := "SELECT std.id, std.nomor_induk, std.name, std.degree_id, std.student_type_id, std.curr_id, std.user_id, std.status FROM students std inner join (select user_id from user_roles where institution_id = ?) ur on std.user_id = ur.user_id where "
-
-	if r.FormValue("nomor_induk") != "" {
-		sqlQuery += "std.nomor_induk like ?"
-		prm = "%" + r.FormValue("nomor_induk") + "%"
-	}
-	if r.FormValue("name") != "" {
-		sqlQuery += "std.name like ?"
-		prm = "%" + r.FormValue("name") + "%"
-	}
-	res, err := db.Query(sqlQuery, r.FormValue("institution_id"), prm)
-	defer mysql.CloseRows(res)
-	if err != nil {
-		common.JSONError(w, structs.ErrNotFound, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	student := structs.Student{}
-	for res.Next() {
-		res.Scan(&student.ID, &student.NomorInduk, &student.Name, &student.DegreeID, &student.StudentType, &student.CurrID, &student.UserID, &student.Status)
-		students = append(students, student)
-	}
-
-	if len(students) != 0 {
-		json.NewEncoder(w).Encode(students)
-	} else {
-		common.JSONError(w, structs.ErrNotFound, "", http.StatusInternalServerError)
-		return
-	}
-}
-*/
 //GetStudents in the db (all)
 func (*stdLogic) GetStudents(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	std, errStr := stdService.GetStudents(r.FormValue("institution_id"))
+	std, errStr := stdService.GetStudents(r.FormValue("institution_id"), r.FormValue("_page"), r.FormValue("_limit"))
 
 	if errStr != nil {
 		common.JSONErr(w, errStr)

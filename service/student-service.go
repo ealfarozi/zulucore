@@ -15,8 +15,8 @@ type StudentService interface {
 	UpdateStudentDetails(std structs.Student) *structs.ErrorMessage
 	Validate(std *structs.Student) (*structs.Student, *structs.ErrorMessage)
 	GetStudentDetails(stdID string) (*structs.Student, *structs.ErrorMessage)
-	GetStudents(insID string) (*[]structs.Student, *structs.ErrorMessage)
-	GetStudent(nmrInduk string, name string, insID string) (*[]structs.Student, *structs.ErrorMessage)
+	GetStudents(insID string, page string, limit string) (*[]structs.Student, *structs.ErrorMessage)
+	GetStudent(nmrInduk string, name string, insID string, page string, limit string) (*[]structs.Student, *structs.ErrorMessage)
 }
 
 type stdService struct{}
@@ -42,12 +42,12 @@ func (*stdService) GetStudentDetails(stdID string) (*structs.Student, *structs.E
 	return stdRepo.GetStudentDetails(stdID)
 }
 
-func (*stdService) GetStudents(insID string) (*[]structs.Student, *structs.ErrorMessage) {
-	return stdRepo.GetStudents(insID)
+func (*stdService) GetStudents(insID string, page string, limit string) (*[]structs.Student, *structs.ErrorMessage) {
+	return stdRepo.GetStudents(insID, page, limit)
 }
 
-func (*stdService) GetStudent(nmrInduk string, name string, insID string) (*[]structs.Student, *structs.ErrorMessage) {
-	return stdRepo.GetStudent(nmrInduk, name, insID)
+func (*stdService) GetStudent(nmrInduk string, name string, insID string, page string, limit string) (*[]structs.Student, *structs.ErrorMessage) {
+	return stdRepo.GetStudent(nmrInduk, name, insID, page, limit)
 }
 
 func (*stdService) CheckEmail(email string, usrID int) int {

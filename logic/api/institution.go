@@ -67,7 +67,7 @@ func (*insLogic) CreateInstitutions(w http.ResponseWriter, r *http.Request) {
 func (*insLogic) GetInstitution(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	ins, errStr := insService.GetInstitution(r.FormValue("insId"), r.FormValue("insCode"))
+	ins, errStr := insService.GetInstitution(r.FormValue("insId"), r.FormValue("insCode"), r.FormValue("_page"), r.FormValue("_limit"))
 
 	if errStr != nil {
 		common.JSONErr(w, errStr)
@@ -81,7 +81,7 @@ func (*insLogic) GetInstitution(w http.ResponseWriter, r *http.Request) {
 func (*insLogic) GetInstitutions(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	ins, errStr := insService.GetInstitutions()
+	ins, errStr := insService.GetInstitutions(r.FormValue("_page"), r.FormValue("_limit"))
 
 	if errStr != nil {
 		common.JSONErr(w, errStr)

@@ -79,7 +79,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/api/v1/tutors?institution_id=3",
+							"raw": "{{url}}/api/v1/tutors?institution_id=3&_page=2&_limit=10",
 							"host": [
 								"{{url}}"
 							],
@@ -92,6 +92,14 @@
 								{
 									"key": "institution_id",
 									"value": "3"
+								},
+								{
+									"key": "_page",
+									"value": "2"
+								},
+								{
+									"key": "_limit",
+									"value": "10"
 								}
 							]
 						}
@@ -122,7 +130,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/api/v1/tutor?institution_id=1&nomor_induk=A123",
+							"raw": "{{url}}/api/v1/tutor?institution_id=1&nomor_induk=A123&_page=1&_limit=2",
 							"host": [
 								"{{url}}"
 							],
@@ -139,6 +147,14 @@
 								{
 									"key": "nomor_induk",
 									"value": "A123"
+								},
+								{
+									"key": "_page",
+									"value": "1"
+								},
+								{
+									"key": "_limit",
+									"value": "2"
 								}
 							]
 						}
@@ -169,7 +185,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/api/v1/tutor?institution_id=3&name=lan",
+							"raw": "{{url}}/api/v1/tutor?institution_id=3&name=lan&_page=2&_limit=2",
 							"host": [
 								"{{url}}"
 							],
@@ -186,6 +202,14 @@
 								{
 									"key": "name",
 									"value": "lan"
+								},
+								{
+									"key": "_page",
+									"value": "2"
+								},
+								{
+									"key": "_limit",
+									"value": "2"
 								}
 							]
 						}
@@ -586,7 +610,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/api/v1/institution?insId=1",
+							"raw": "{{url}}/api/v1/institution?insId=1&_page=1&_limit=1",
 							"host": [
 								"{{url}}"
 							],
@@ -598,6 +622,14 @@
 							"query": [
 								{
 									"key": "insId",
+									"value": "1"
+								},
+								{
+									"key": "_page",
+									"value": "1"
+								},
+								{
+									"key": "_limit",
 									"value": "1"
 								}
 							]
@@ -629,7 +661,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/api/v1/institution?insCode=UI",
+							"raw": "{{url}}/api/v1/institution?_page=1&_limit=1&insCode=UIA",
 							"host": [
 								"{{url}}"
 							],
@@ -640,8 +672,16 @@
 							],
 							"query": [
 								{
+									"key": "_page",
+									"value": "1"
+								},
+								{
+									"key": "_limit",
+									"value": "1"
+								},
+								{
 									"key": "insCode",
-									"value": "UI"
+									"value": "UIA"
 								}
 							]
 						}
@@ -672,7 +712,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/api/v1/institutions",
+							"raw": "{{url}}/api/v1/institutions?_page=1&_limit=2",
 							"host": [
 								"{{url}}"
 							],
@@ -680,6 +720,16 @@
 								"api",
 								"v1",
 								"institutions"
+							],
+							"query": [
+								{
+									"key": "_page",
+									"value": "1"
+								},
+								{
+									"key": "_limit",
+									"value": "2"
+								}
 							]
 						}
 					},
@@ -1258,7 +1308,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/api/v1/student?institution_id=13&nomor_induk=No",
+							"raw": "{{url}}/api/v1/student?institution_id=13&nomor_induk=_&_page=1&_limit=10",
 							"host": [
 								"{{url}}"
 							],
@@ -1274,7 +1324,15 @@
 								},
 								{
 									"key": "nomor_induk",
-									"value": "No"
+									"value": "_"
+								},
+								{
+									"key": "_page",
+									"value": "1"
+								},
+								{
+									"key": "_limit",
+									"value": "10"
 								}
 							]
 						}
@@ -1305,7 +1363,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/api/v1/students?institution_id=14",
+							"raw": "{{url}}/api/v1/students?institution_id=14&_page=1&_limit=1",
 							"host": [
 								"{{url}}"
 							],
@@ -1318,6 +1376,14 @@
 								{
 									"key": "institution_id",
 									"value": "14"
+								},
+								{
+									"key": "_page",
+									"value": "1"
+								},
+								{
+									"key": "_limit",
+									"value": "1"
 								}
 							]
 						}
@@ -1348,7 +1414,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/api/v1/student?institution_id=13&name=sep",
+							"raw": "{{url}}/api/v1/student?institution_id=13&name=asep&_page=1&_limit=2",
 							"host": [
 								"{{url}}"
 							],
@@ -1364,7 +1430,15 @@
 								},
 								{
 									"key": "name",
-									"value": "sep"
+									"value": "asep"
+								},
+								{
+									"key": "_page",
+									"value": "1"
+								},
+								{
+									"key": "_limit",
+									"value": "2"
 								}
 							]
 						}

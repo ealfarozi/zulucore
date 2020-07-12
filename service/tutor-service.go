@@ -23,9 +23,9 @@ type TutorService interface {
 	UpdateJournals(jour structs.TutorJournal) *structs.ErrorMessage
 	UpdateCertificates(cert structs.TutorCertificate) *structs.ErrorMessage
 	UpdateResearches(res structs.TutorResearch) *structs.ErrorMessage
-	GetTutors(insID string) (*[]structs.Tutor, *structs.ErrorMessage)
+	GetTutors(insID string, page string, limit string) (*[]structs.Tutor, *structs.ErrorMessage)
 	GetTutorDetails(tutorID string) (*structs.Tutor, *structs.ErrorMessage)
-	GetTutor(nmrInd string, name string, insID string) (*[]structs.Tutor, *structs.ErrorMessage)
+	GetTutor(nmrInd string, name string, insID string, page string, limit string) (*[]structs.Tutor, *structs.ErrorMessage)
 	CheckNomorInduk(insID int, nmrInduk string, tutorID int) int
 	CheckEmail(email string, usrID int) int
 }
@@ -41,12 +41,12 @@ func NewTutorService(repository interfaces.TutorRepository) TutorService {
 	return &service{}
 }
 
-func (*service) GetTutor(nmrInd string, name string, insID string) (*[]structs.Tutor, *structs.ErrorMessage) {
-	return repo.GetTutor(nmrInd, name, insID)
+func (*service) GetTutor(nmrInd string, name string, insID string, page string, limit string) (*[]structs.Tutor, *structs.ErrorMessage) {
+	return repo.GetTutor(nmrInd, name, insID, page, limit)
 }
 
-func (*service) GetTutors(insID string) (*[]structs.Tutor, *structs.ErrorMessage) {
-	return repo.GetTutors(insID)
+func (*service) GetTutors(insID string, page string, limit string) (*[]structs.Tutor, *structs.ErrorMessage) {
+	return repo.GetTutors(insID, page, limit)
 }
 
 func (*service) GetTutorDetails(tutorID string) (*structs.Tutor, *structs.ErrorMessage) {

@@ -113,15 +113,14 @@ func (*repo) GetTutorDetails(tutorID string) (*structs.Tutor, *structs.ErrorMess
 	return &tutor, nil
 }
 
-func (*repo) GetTutors(insID string) (*[]structs.Tutor, *structs.ErrorMessage) {
+func (*repo) GetTutors(insID string, page string, limit string) (*[]structs.Tutor, *structs.ErrorMessage) {
 	var tutors []structs.Tutor
 	var errors structs.ErrorMessage
 
 	db := mysql.InitializeMySQL()
 
 	sqlQuery := "SELECT ttr.id, ttr.nomor_induk, ttr.name, ttr.tutor_type_id, ttr.user_id, ttr.status FROM tutors ttr inner join (select user_id from user_roles where institution_id = ?) ur on ttr.user_id = ur.user_id"
-
-	//var tutor structs.Tutor
+	sqlQuery += common.SetPageLimit(page, limit)
 
 	res, err := db.Query(sqlQuery, insID)
 	defer mysql.CloseRows(res)
@@ -148,7 +147,7 @@ func (*repo) GetTutors(insID string) (*[]structs.Tutor, *structs.ErrorMessage) {
 	}
 }
 
-func (*repo) GetTutor(nmrInd string, name string, insID string) (*[]structs.Tutor, *structs.ErrorMessage) {
+func (*repo) GetTutor(nmrInd string, name string, insID string, page string, limit string) (*[]structs.Tutor, *structs.ErrorMessage) {
 	var prm string
 
 	var tutors []structs.Tutor
@@ -166,6 +165,7 @@ func (*repo) GetTutor(nmrInd string, name string, insID string) (*[]structs.Tuto
 		sqlQuery += "ttr.name like ?"
 		prm = "%" + name + "%"
 	}
+	sqlQuery += common.SetPageLimit(page, limit)
 	res, err := db.Query(sqlQuery, insID, prm)
 	defer mysql.CloseRows(res)
 	if err != nil {

@@ -45,7 +45,7 @@ func NewTutorLogic(service service.TutorService) TutorLogic {
 func (*logic) GetTutors(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	tutors, errStr := tutorService.GetTutors(r.FormValue("institution_id"))
+	tutors, errStr := tutorService.GetTutors(r.FormValue("institution_id"), r.FormValue("_page"), r.FormValue("_limit"))
 
 	if errStr != nil {
 		common.JSONErr(w, errStr)
@@ -73,7 +73,7 @@ func (*logic) GetTutorDetails(w http.ResponseWriter, r *http.Request) {
 func (*logic) GetTutor(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	tutors, errStr := tutorService.GetTutor(r.FormValue("nomor_induk"), r.FormValue("name"), r.FormValue("institution_id"))
+	tutors, errStr := tutorService.GetTutor(r.FormValue("nomor_induk"), r.FormValue("name"), r.FormValue("institution_id"), r.FormValue("_page"), r.FormValue("_limit"))
 
 	if errStr != nil {
 		common.JSONErr(w, errStr)
@@ -288,7 +288,7 @@ func (*logic) CreateTutors(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		checkNomorInduk := common.CheckNomorInduk(tutors[j].InsID, tutors[j].NomorInduk, 0)
+		checkNomorInduk := tutorService.CheckNomorInduk(tutors[j].InsID, tutors[j].NomorInduk, 0)
 		if checkNomorInduk != 0 {
 			errStr := structs.ErrorMessage{Data: tutors[j].NomorInduk, Message: structs.NomorInd, SysMessage: "", Code: http.StatusInternalServerError}
 			errs = append(errs, errStr)
