@@ -1491,6 +1491,46 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Parent",
+			"item": [
+				{
+					"name": "Create Parent",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n        \"name\": \"Ibu Asep\",\n        \"phone\": \"081234567895\",\n        \"email\": \"IbuAsep@asdd.com\",\n        \"street_address\": \"Jalan Raya ajah\",\n        \"address_map_id\": 7880,\n        \"gender_id\": 1,\n        \"profession_id\": 15,\n        \"user_id\": 30,\n        \"students\": [\n            {\n                \"id\": 94\n            },\n            {\n                \"id\": 95\n            }\n        ]\n    },\n    {\n        \"name\": \"Bpk Asep\",\n        \"phone\": \"081234567894\",\n        \"email\": \"BapakAsep@asdd.com\",\n        \"street_address\": \"Jalan Raya ajah\",\n        \"address_map_id\": 7880,\n        \"gender_id\": 1,\n        \"profession_id\": 15,\n        \"user_id\": 30,\n        \"students\": [\n            {\n                \"id\": 94\n            },\n            {\n                \"id\": 95\n            }\n        ]\n    }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/parents",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"parents"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"protocolProfileBehavior": {}
