@@ -4,6 +4,7 @@ import "github.com/ealfarozi/zulucore/structs"
 
 type StudentRepository interface {
 	CreateStudents(std structs.Student) *structs.ErrorMessage
+	CreateParent(prt structs.Parents) *structs.ErrorMessage
 	CheckEmail(email string, usrID int) int
 	CheckNomorIndukStd(insID int, nmrInduk string, stdID int) int
 	UpdateStudentDetails(std structs.Student) *structs.ErrorMessage

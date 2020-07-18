@@ -21,6 +21,7 @@ var (
 //TutorLogic is the interface of httpRequest for Tutor
 type StudentLogic interface {
 	CreateStudents(w http.ResponseWriter, r *http.Request)
+	CreateParents(w http.ResponseWriter, r *http.Request)
 	UpdateStudentDetails(w http.ResponseWriter, r *http.Request)
 	GetStudentDetails(w http.ResponseWriter, r *http.Request)
 	GetStudents(w http.ResponseWriter, r *http.Request)
@@ -70,6 +71,43 @@ func (*stdLogic) CreateStudents(w http.ResponseWriter, r *http.Request) {
 			continue
 		} else {
 			errs = append(errs, structs.ErrorMessage{Data: stds[j].NomorInduk, Message: structs.Success, SysMessage: "", Code: http.StatusOK})
+		}
+	}
+	common.JSONErrs(w, &errs)
+	return
+
+}
+
+//CreateParent is the func to insert the Parent and student-parent relationship data
+func (*stdLogic) CreateParents(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var prts []structs.Parents
+	var errs []structs.ErrorMessage
+
+	_ = json.NewDecoder(r.Body).Decode(&prts)
+
+	for j := range prts {
+		prt, errStr := stdService.ValidateParent(&prts[j])
+		if errStr != nil {
+			errs = append(errs, *errStr)
+			continue
+		}
+
+		if prts[j].Email != "" {
+			checkEmail := stdService.CheckEmail(prts[j].Email, prts[j].UserID)
+			if checkEmail != 0 {
+				errStr := structs.ErrorMessage{Data: prts[j].Email, Message: structs.Email, SysMessage: "", Code: http.StatusInternalServerError}
+				errs = append(errs, errStr)
+				continue
+			}
+		}
+
+		errStr = stdService.CreateParent(*prt)
+		if errStr.Code != http.StatusOK {
+			errs = append(errs, *errStr)
+			continue
+		} else {
+			errs = append(errs, structs.ErrorMessage{Data: prts[j].Name, Message: structs.Success, SysMessage: "", Code: http.StatusOK})
 		}
 	}
 	common.JSONErrs(w, &errs)

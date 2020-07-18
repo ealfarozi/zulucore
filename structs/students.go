@@ -51,14 +51,23 @@ type StudentDetails struct {
 
 //Parent struct
 type Parents struct {
-	ID            int     `json:"id,omitempty"`
-	Name          string  `json:"name" validate:"required"`
-	Phone         string  `json:"phone,omitempty" validate:"min=8,max=20,startswith=08"`
-	Email         string  `json:"email,omitempty"  validate:"email"`
-	GenderID      int     `json:"gender_id" validate:"required"`
-	UserID        int     `json:"user_id,omitempty" validate:"required"`
-	ProfessionID  int     `json:"profession_id,omitempty" validate:"required"`
-	StreetAddress string  `json:"street_address,omitempty"`
-	AddressID     int     `json:"address_map_id,omitempty"`
-	AddressDetail Address `json:"address_detail,omitempty"`
+	ID            int             `json:"id,omitempty"`
+	Name          string          `json:"name" validate:"required"`
+	Phone         string          `json:"phone,omitempty" validate:"min=8,max=20,startswith=08"`
+	Email         string          `json:"email,omitempty"  validate:"email"`
+	GenderID      int             `json:"gender_id" validate:"required"`
+	UserID        int             `json:"user_id,omitempty" validate:"required"`
+	ProfessionID  int             `json:"profession_id,omitempty" validate:"required"`
+	StreetAddress string          `json:"street_address,omitempty"`
+	AddressID     int             `json:"address_map_id,omitempty"`
+	AddressDetail Address         `json:"address_detail,omitempty"`
+	Students      []StudentParent `json:"students,omitempty"`
+}
+
+//Student-Parent struct
+type StudentParent struct {
+	ID      int    `json:"id,omitempty"`
+	Name    string `json:"name,omitempty"`
+	InsID   int    `json:"institution_id,omitempty"`
+	InsName string `json:"institution_name,omitempty"`
 }

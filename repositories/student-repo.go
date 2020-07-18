@@ -90,6 +90,80 @@ func (*stdRepo) CreateStudents(std structs.Student) *structs.ErrorMessage {
 	return &errors
 }
 
+func (*stdRepo) CreateParent(prt structs.Parents) *structs.ErrorMessage {
+	var errors structs.ErrorMessage
+
+	db := mysql.InitializeMySQL()
+	tx, err := db.Begin()
+
+	//start checking insert
+	if err != nil {
+		tx.Rollback()
+		errors.Message = structs.QueryErr
+		errors.Data = prt.Name
+		errors.SysMessage = err.Error()
+		errors.Code = http.StatusInternalServerError
+		return &errors
+	}
+
+	sqlQuery := "insert into parents (name, phone, email, gender_id, profession_id, user_id, street_address, address_id) values (?, ?, ?, ?, ?, ?, ?, ?)"
+	res, err := tx.Exec(sqlQuery, &prt.Name, &prt.Phone, &prt.Email, &prt.GenderID, &prt.ProfessionID, &prt.UserID, &prt.StreetAddress, &prt.AddressID)
+	if err != nil {
+		tx.Rollback()
+		errors.Message = structs.QueryErr
+		errors.Data = prt.Name
+		errors.SysMessage = err.Error()
+		errors.Code = http.StatusInternalServerError
+		return &errors
+	}
+
+	lastID, err := res.LastInsertId()
+	lastParentID := int(lastID)
+	if err != nil {
+		tx.Rollback()
+		errors.Message = structs.LastIDErr
+		errors.Data = prt.Name
+		errors.SysMessage = err.Error()
+		errors.Code = http.StatusInternalServerError
+		return &errors
+	}
+
+	//insert details
+	if prt.Students != nil {
+		sqlQueryDetail := "insert into student_parents (parent_id, student_id) values (?, ?)"
+
+		for j := range prt.Students {
+			res, err := tx.Exec(sqlQueryDetail, lastParentID, &prt.Students[j].ID)
+			if err != nil {
+				tx.Rollback()
+				errors.Message = structs.QueryErr
+				errors.Data = prt.Name
+				errors.SysMessage = err.Error()
+				errors.Code = http.StatusInternalServerError
+				return &errors
+			}
+
+			lastID, err := res.LastInsertId()
+			if err != nil {
+				tx.Rollback()
+				errors.Message = structs.LastIDErr
+				errors.Data = prt.Name
+				errors.SysMessage = err.Error()
+				errors.Code = http.StatusInternalServerError
+				log.Println(lastID)
+				return &errors
+			}
+		}
+
+	}
+
+	errors.Message = structs.Success
+	errors.Code = http.StatusOK
+
+	tx.Commit()
+	return &errors
+}
+
 func (*stdRepo) CheckEmail(email string, usrID int) int {
 	db := mysql.InitializeMySQL()
 	sqlQueryCheck := "select count(1) from users where username = ? and id != ?"
@@ -321,32 +395,3 @@ func (*stdRepo) GetStudentDetails(stdID string) (*structs.Student, *structs.Erro
 		return nil, &errors
 	}
 }
-
-/*
-func GetStudentDetails(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	var student structs.Student
-	var det structs.StudentDetails
-
-	db := mysql.InitializeMySQL()
-	sqlQueryStudent := "select id, nomor_induk, name, degree_id, student_type_id, curr_id, user_id, status from students where id = ?"
-	err := db.QueryRow(sqlQueryStudent, r.FormValue("student_id")).Scan(&student.ID, &student.NomorInduk, &student.Name, &student.DegreeID, &student.StudentType, &student.CurrID, &student.UserID, &student.Status)
-	if err != nil {
-		common.JSONError(w, structs.ErrNotFound, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	//Details
-	sqlQueryDetail := "select id, kk_no, ktp, sim, npwp, gender_id, pob_id, dob, phone, email, street_address, address_id, institution_source_name, join_date, tutor_id from student_details where student_id = ?"
-	resDet, err := db.Query(sqlQueryDetail, r.FormValue("student_id"))
-	defer mysql.CloseRows(resDet)
-	for resDet.Next() {
-		resDet.Scan(&det.ID, &det.KkNO, &det.Ktp, &det.Sim, &det.Npwp, &det.GenderID, &det.PobID, &det.Dob, &det.Phone, &det.Email, &det.StreetAddress, &det.AddressID, &det.InsSource, &det.JoinDate, &det.TutorID)
-		student.Details = &det
-		student.Details.AddressDetail = common.GetAddressOnly(det.AddressID)
-	}
-
-	json.NewEncoder(w).Encode(student)
-}
-*/
