@@ -7,6 +7,7 @@ type StudentRepository interface {
 	CreateParent(prt structs.Parents) *structs.ErrorMessage
 	CheckEmail(email string, usrID int) int
 	CheckNomorIndukStd(insID int, nmrInduk string, stdID int) int
+	CheckFamily(famID int, stdID int) int
 	UpdateStudentDetails(std structs.Student) *structs.ErrorMessage
 	GetStudentDetails(stdID string) (*structs.Student, *structs.ErrorMessage)
 	GetStudents(insID string, page string, limit string) (*[]structs.Student, *structs.ErrorMessage)

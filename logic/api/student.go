@@ -93,6 +93,21 @@ func (*stdLogic) CreateParents(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
+		//if prts[j].UserID != 0 {
+		var checkFamily int
+		for i := range prts[j].Students {
+			checkFamily = stdService.CheckFamily(prts[j].FamilyID, prts[j].Students[i].ID)
+			if checkFamily != 0 {
+				errStr := structs.ErrorMessage{Data: prts[j].Name, Message: structs.Family, SysMessage: "", Code: http.StatusInternalServerError}
+				errs = append(errs, errStr)
+				break
+			}
+		}
+		if checkFamily != 0 {
+			continue
+		}
+		//}
+
 		if prts[j].Email != "" {
 			checkEmail := stdService.CheckEmail(prts[j].Email, prts[j].UserID)
 			if checkEmail != 0 {

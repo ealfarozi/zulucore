@@ -106,8 +106,8 @@ func (*stdRepo) CreateParent(prt structs.Parents) *structs.ErrorMessage {
 		return &errors
 	}
 
-	sqlQuery := "insert into parents (name, phone, email, gender_id, profession_id, user_id, street_address, address_id) values (?, ?, ?, ?, ?, ?, ?, ?)"
-	res, err := tx.Exec(sqlQuery, &prt.Name, &prt.Phone, &prt.Email, &prt.GenderID, &prt.ProfessionID, &prt.UserID, &prt.StreetAddress, &prt.AddressID)
+	sqlQuery := "insert into parents (name, phone, email, gender_id, family_id, profession_id, user_id, street_address, address_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	res, err := tx.Exec(sqlQuery, &prt.Name, &prt.Phone, &prt.Email, &prt.GenderID, &prt.FamilyID, &prt.ProfessionID, &prt.UserID, &prt.StreetAddress, &prt.AddressID)
 	if err != nil {
 		tx.Rollback()
 		errors.Message = structs.QueryErr
@@ -154,7 +154,6 @@ func (*stdRepo) CreateParent(prt structs.Parents) *structs.ErrorMessage {
 				return &errors
 			}
 		}
-
 	}
 
 	errors.Message = structs.Success
@@ -191,6 +190,18 @@ func (*stdRepo) CheckNomorIndukStd(insID int, nmrInduk string, stdID int) int {
 		if err != nil {
 			check = 99
 		}
+	}
+
+	return check
+}
+
+func (*stdRepo) CheckFamily(famID int, stdID int) int {
+	db := mysql.InitializeMySQL()
+	sqlQueryCheck := "select count(1) from parents par inner join student_parents sp on par.id = sp.parent_id where sp.student_id = ? and par.family_id = ?"
+	check := 0
+	err := db.QueryRow(sqlQueryCheck, &stdID, &famID).Scan(&check)
+	if err != nil {
+		check = 99
 	}
 
 	return check

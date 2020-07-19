@@ -12,6 +12,7 @@ type StudentService interface {
 	CreateStudents(std structs.Student) *structs.ErrorMessage
 	CreateParent(prt structs.Parents) *structs.ErrorMessage
 	CheckEmail(email string, usrID int) int
+	CheckFamily(famID int, stdID int) int
 	CheckNomorIndukStd(insID int, nmrInduk string, stdID int) int
 	UpdateStudentDetails(std structs.Student) *structs.ErrorMessage
 	Validate(std *structs.Student) (*structs.Student, *structs.ErrorMessage)
@@ -58,6 +59,9 @@ func (*stdService) GetStudent(nmrInduk string, name string, insID string, page s
 
 func (*stdService) CheckEmail(email string, usrID int) int {
 	return stdRepo.CheckEmail(email, usrID)
+}
+func (*stdService) CheckFamily(famID int, stdID int) int {
+	return stdRepo.CheckFamily(famID, stdID)
 }
 
 func (*stdService) CheckNomorIndukStd(insID int, nmrInduk string, stdID int) int {
