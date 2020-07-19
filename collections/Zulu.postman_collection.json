@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "d4a79054-8f2c-4166-aa42-d914638c12f1",
+		"_postman_id": "4c83f785-d266-44b5-884d-939312623bad",
 		"name": "Zulu",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -14,7 +14,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "524127ea-37df-4026-a699-cfa007d2c158",
+								"id": "266ef1aa-0600-42cd-9a7c-e0315fe82346",
 								"exec": [
 									"var data = pm.response.json();",
 									"pm.environment.set(\"token\", data.data.access_token);"
@@ -1508,7 +1508,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n    {\n        \"name\": \"Ibu Asep\",\n        \"phone\": \"081234567895\",\n        \"email\": \"IbuAsep@asdd.com\",\n        \"street_address\": \"Jalan Raya ajah\",\n        \"address_map_id\": 7880,\n        \"gender_id\": 1,\n        \"profession_id\": 15,\n        \"user_id\": 30,\n        \"students\": [\n            {\n                \"id\": 94\n            },\n            {\n                \"id\": 95\n            }\n        ]\n    },\n    {\n        \"name\": \"Bpk Asep\",\n        \"phone\": \"081234567894\",\n        \"email\": \"BapakAsep@asdd.com\",\n        \"street_address\": \"Jalan Raya ajah\",\n        \"address_map_id\": 7880,\n        \"gender_id\": 1,\n        \"profession_id\": 15,\n        \"user_id\": 30,\n        \"students\": [\n            {\n                \"id\": 94\n            },\n            {\n                \"id\": 95\n            }\n        ]\n    }\n]",
+							"raw": "[\n    {\n        \"name\": \"Ibu Asep\",\n        \"phone\": \"081234567895\",\n        \"email\": \"IbuAsep@asdd.com\",\n        \"street_address\": \"Jalan Raya ajah\",\n        \"address_map_id\": 7880,\n        \"gender_id\": 1,\n        \"family_id\": 2,\n        \"profession_id\": 15,\n        \"user_id\": 30,\n        \"students\": [\n            {\n                \"id\": 94\n            },\n            {\n                \"id\": 95\n            }\n        ]\n    },\n    {\n        \"name\": \"Bpk Asep\",\n        \"phone\": \"081234567894\",        \n        \"street_address\": \"Jalan Raya ajah\",\n        \"address_map_id\": 7880,\n        \"gender_id\": 1,\n        \"family_id\": 1,\n        \"profession_id\": 15,        \n        \"students\": [\n            {\n                \"id\": 94\n            },\n            {\n                \"id\": 95\n            }\n        ]\n    }\n]",
 							"options": {
 								"raw": {
 									"language": "json"
