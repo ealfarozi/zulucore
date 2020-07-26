@@ -53,6 +53,7 @@ func main() {
 	httpRouter.POST("/api/v1/student/details", stdLogic.UpdateStudentDetails)
 
 	httpRouter.POST("/api/v1/parents", stdLogic.CreateParents)
+	httpRouter.GET("/api/v1/parents", stdLogic.GetParents)
 
 	httpRouter.SERVE(":8000")
 }

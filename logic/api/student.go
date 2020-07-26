@@ -25,6 +25,7 @@ type StudentLogic interface {
 	UpdateStudentDetails(w http.ResponseWriter, r *http.Request)
 	GetStudentDetails(w http.ResponseWriter, r *http.Request)
 	GetStudents(w http.ResponseWriter, r *http.Request)
+	GetParents(w http.ResponseWriter, r *http.Request)
 	GetStudent(w http.ResponseWriter, r *http.Request)
 }
 
@@ -93,10 +94,9 @@ func (*stdLogic) CreateParents(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		//if prts[j].UserID != 0 {
 		var checkFamily int
 		for i := range prts[j].Students {
-			checkFamily = stdService.CheckFamily(prts[j].FamilyID, prts[j].Students[i].ID)
+			checkFamily = stdService.CheckFamily(prts[j].FamilyID, prts[j].Students[i].ID, prts[j].ID)
 			if checkFamily != 0 {
 				errStr := structs.ErrorMessage{Data: prts[j].Name, Message: structs.Family, SysMessage: "", Code: http.StatusInternalServerError}
 				errs = append(errs, errStr)
@@ -106,7 +106,6 @@ func (*stdLogic) CreateParents(w http.ResponseWriter, r *http.Request) {
 		if checkFamily != 0 {
 			continue
 		}
-		//}
 
 		if prts[j].Email != "" {
 			checkEmail := stdService.CheckEmail(prts[j].Email, prts[j].UserID)
@@ -154,6 +153,19 @@ func (*stdLogic) GetStudents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	json.NewEncoder(w).Encode(std)
+}
+
+//GetParents is the func to get parent data based on student_id (or All)
+func (*stdLogic) GetParents(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	par, errStr := stdService.GetParents(r.FormValue("student_id"), r.FormValue("_page"), r.FormValue("_limit"))
+
+	if errStr != nil {
+		common.JSONErr(w, errStr)
+		return
+	}
+	json.NewEncoder(w).Encode(par)
 }
 
 //GetStudentDetails is the func to get the student details based on student_id
@@ -213,11 +225,6 @@ func (*stdLogic) UpdateStudentDetails(w http.ResponseWriter, r *http.Request) {
 	}
 	common.JSONErrs(w, &errs)
 	return
-}
-
-//UpdateParents is the func to update the student's parents information
-func UpdateParents(w http.ResponseWriter, r *http.Request) {
-
 }
 
 //GetScores is the func to get all of the scores of a student

@@ -12,13 +12,14 @@ type StudentService interface {
 	CreateStudents(std structs.Student) *structs.ErrorMessage
 	CreateParent(prt structs.Parents) *structs.ErrorMessage
 	CheckEmail(email string, usrID int) int
-	CheckFamily(famID int, stdID int) int
+	CheckFamily(famID int, stdID int, parID int) int
 	CheckNomorIndukStd(insID int, nmrInduk string, stdID int) int
 	UpdateStudentDetails(std structs.Student) *structs.ErrorMessage
 	Validate(std *structs.Student) (*structs.Student, *structs.ErrorMessage)
 	ValidateParent(prt *structs.Parents) (*structs.Parents, *structs.ErrorMessage)
 	GetStudentDetails(stdID string) (*structs.Student, *structs.ErrorMessage)
 	GetStudents(insID string, page string, limit string) (*[]structs.Student, *structs.ErrorMessage)
+	GetParents(stdID string, page string, limit string) (*[]structs.Parents, *structs.ErrorMessage)
 	GetStudent(nmrInduk string, name string, insID string, page string, limit string) (*[]structs.Student, *structs.ErrorMessage)
 }
 
@@ -53,6 +54,10 @@ func (*stdService) GetStudents(insID string, page string, limit string) (*[]stru
 	return stdRepo.GetStudents(insID, page, limit)
 }
 
+func (*stdService) GetParents(stdID string, page string, limit string) (*[]structs.Parents, *structs.ErrorMessage) {
+	return stdRepo.GetParents(stdID, page, limit)
+}
+
 func (*stdService) GetStudent(nmrInduk string, name string, insID string, page string, limit string) (*[]structs.Student, *structs.ErrorMessage) {
 	return stdRepo.GetStudent(nmrInduk, name, insID, page, limit)
 }
@@ -60,8 +65,8 @@ func (*stdService) GetStudent(nmrInduk string, name string, insID string, page s
 func (*stdService) CheckEmail(email string, usrID int) int {
 	return stdRepo.CheckEmail(email, usrID)
 }
-func (*stdService) CheckFamily(famID int, stdID int) int {
-	return stdRepo.CheckFamily(famID, stdID)
+func (*stdService) CheckFamily(famID int, stdID int, parID int) int {
+	return stdRepo.CheckFamily(famID, stdID, parID)
 }
 
 func (*stdService) CheckNomorIndukStd(insID int, nmrInduk string, stdID int) int {

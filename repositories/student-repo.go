@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 
@@ -90,8 +91,10 @@ func (*stdRepo) CreateStudents(std structs.Student) *structs.ErrorMessage {
 	return &errors
 }
 
+//CreateParent is the func to create/update parent data based on student ID
 func (*stdRepo) CreateParent(prt structs.Parents) *structs.ErrorMessage {
 	var errors structs.ErrorMessage
+	var lastParentID int
 
 	db := mysql.InitializeMySQL()
 	tx, err := db.Begin()
@@ -106,26 +109,41 @@ func (*stdRepo) CreateParent(prt structs.Parents) *structs.ErrorMessage {
 		return &errors
 	}
 
+	sqlQueryUpd := "update parents set name = ?, phone = ?, email = ?, gender_id = ?, family_id = ?, profession_id = ?, street_address = ?, address_id = ? where id = ?"
 	sqlQuery := "insert into parents (name, phone, email, gender_id, family_id, profession_id, user_id, street_address, address_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-	res, err := tx.Exec(sqlQuery, &prt.Name, &prt.Phone, &prt.Email, &prt.GenderID, &prt.FamilyID, &prt.ProfessionID, &prt.UserID, &prt.StreetAddress, &prt.AddressID)
-	if err != nil {
-		tx.Rollback()
-		errors.Message = structs.QueryErr
-		errors.Data = prt.Name
-		errors.SysMessage = err.Error()
-		errors.Code = http.StatusInternalServerError
-		return &errors
-	}
 
-	lastID, err := res.LastInsertId()
-	lastParentID := int(lastID)
-	if err != nil {
-		tx.Rollback()
-		errors.Message = structs.LastIDErr
-		errors.Data = prt.Name
-		errors.SysMessage = err.Error()
-		errors.Code = http.StatusInternalServerError
-		return &errors
+	if prt.ID != 0 {
+		_, err := tx.Exec(sqlQueryUpd, &prt.Name, &prt.Phone, &prt.Email, &prt.GenderID, &prt.FamilyID, &prt.ProfessionID, &prt.StreetAddress, &prt.AddressID, &prt.ID)
+		if err != nil {
+			tx.Rollback()
+			errors.Message = structs.QueryErr
+			errors.Data = prt.Name
+			errors.SysMessage = err.Error()
+			errors.Code = http.StatusInternalServerError
+			return &errors
+		}
+
+	} else {
+		res, err := tx.Exec(sqlQuery, &prt.Name, &prt.Phone, &prt.Email, &prt.GenderID, &prt.FamilyID, &prt.ProfessionID, &prt.UserID, &prt.StreetAddress, &prt.AddressID)
+		if err != nil {
+			tx.Rollback()
+			errors.Message = structs.QueryErr
+			errors.Data = prt.Name
+			errors.SysMessage = err.Error()
+			errors.Code = http.StatusInternalServerError
+			return &errors
+		}
+
+		lastID, err := res.LastInsertId()
+		lastParentID = int(lastID)
+		if err != nil {
+			tx.Rollback()
+			errors.Message = structs.LastIDErr
+			errors.Data = prt.Name
+			errors.SysMessage = err.Error()
+			errors.Code = http.StatusInternalServerError
+			return &errors
+		}
 	}
 
 	//insert details
@@ -195,11 +213,11 @@ func (*stdRepo) CheckNomorIndukStd(insID int, nmrInduk string, stdID int) int {
 	return check
 }
 
-func (*stdRepo) CheckFamily(famID int, stdID int) int {
+func (*stdRepo) CheckFamily(famID int, stdID int, parID int) int {
 	db := mysql.InitializeMySQL()
-	sqlQueryCheck := "select count(1) from parents par inner join student_parents sp on par.id = sp.parent_id where sp.student_id = ? and par.family_id = ?"
+	sqlQueryCheck := "select count(1) from parents par inner join student_parents sp on par.id = sp.parent_id where sp.student_id = ? and par.family_id = ? and par.id != ?"
 	check := 0
-	err := db.QueryRow(sqlQueryCheck, &stdID, &famID).Scan(&check)
+	err := db.QueryRow(sqlQueryCheck, &stdID, &famID, &parID).Scan(&check)
 	if err != nil {
 		check = 99
 	}
@@ -356,6 +374,48 @@ func (*stdRepo) GetStudents(insID string, page string, limit string) (*[]structs
 
 	if len(students) != 0 {
 		return &students, nil
+	} else {
+		errors.Message = structs.ErrNotFound
+		errors.SysMessage = ""
+		errors.Code = http.StatusInternalServerError
+		return nil, &errors
+	}
+}
+
+//GetParents is a func to get all parent data based on student_id (or All)
+func (*stdRepo) GetParents(stdID string, page string, limit string) (*[]structs.Parents, *structs.ErrorMessage) {
+	var parents []structs.Parents
+	var errors structs.ErrorMessage
+
+	db := mysql.InitializeMySQL()
+
+	sqlQuery := "select par.id, par.name, par.phone, par.email, par.gender_id, par.family_id, par.profession_id, par.street_address, par.address_id, par.user_id from student_parents sp inner join parents par on sp.parent_id = par.id "
+	var res *sql.Rows
+	var err error
+	if stdID != "" {
+		sqlQuery += "where sp.student_id = ?"
+		sqlQuery += common.SetPageLimit(page, limit)
+		res, err = db.Query(sqlQuery, stdID)
+	} else {
+		sqlQuery += common.SetPageLimit(page, limit)
+		res, err = db.Query(sqlQuery)
+	}
+	defer mysql.CloseRows(res)
+	if err != nil {
+		errors.Message = structs.QueryErr
+		errors.SysMessage = err.Error()
+		errors.Code = http.StatusInternalServerError
+		return nil, &errors
+	}
+
+	parent := structs.Parents{}
+	for res.Next() {
+		res.Scan(&parent.ID, &parent.Name, &parent.Phone, &parent.Email, &parent.GenderID, &parent.FamilyID, &parent.ProfessionID, &parent.StreetAddress, &parent.AddressID, &parent.UserID)
+		parents = append(parents, parent)
+	}
+
+	if len(parents) != 0 {
+		return &parents, nil
 	} else {
 		errors.Message = structs.ErrNotFound
 		errors.SysMessage = ""
